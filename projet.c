@@ -6,10 +6,10 @@
 #include <errno.h>
 #include <string.h>
 
-struct arg_struct {
-    int id;
-    int PHILOSOPHES;
-};
+#define PHILOSOPHES 3
+
+static pthread_mutex_t baguette[PHILOSOPHES];
+
 
 void error(int err, char *msg) {
   fprintf(stderr,"%s a retourné %d message d'erreur : %s\n",msg,err,strerror(errno));
@@ -27,11 +27,9 @@ void mange(int id) {
 
 void* philosophe ( void* arg )
 {
-    struct arg_struct *args = arg;
-
-  int *id=(int *) args;
-  int left = args->id;
-  int right = (left + 1) % args->PHILOSOPHES;
+  int *id=(int *) arg;
+  int left = *id;
+  int right = (left + 1) % PHILOSOPHES;
   while(true) {
     // philosophe pense
     if(left<right) {
@@ -51,39 +49,35 @@ void* philosophe ( void* arg )
 ///BBB
 int main ( int argc, char *argv[])
 {
-    struct arg_struct args;
-
-   args.PHILOSOPHES = atoi(argv[1]);
-   int id[];
-   args.id = id[args.PHILOSOPHES];
+   int i;
+   int id[PHILOSOPHES];
    int err;
-   pthread_t phil[args.PHILOSOPHES];
-    pthread_mutex_t baguette[args.PHILOSOPHES];
+   pthread_t phil[PHILOSOPHES];
 
    srand(getpid());
 
-   for (int i = 0; i < args.PHILOSOPHES; i++)
+   for (i = 0; i < PHILOSOPHES; i++)
      id[i]=i;
 
-   for (int i = 0; i < args.PHILOSOPHES; i++) {
+   for (i = 0; i < PHILOSOPHES; i++) {
      err=pthread_mutex_init( &baguette[i], NULL);
       if(err!=0)
 	error(err,"pthread_mutex_init");
    }
 
-   for (int i = 0; i < args.PHILOSOPHES; i++) {
-     err=pthread_create(&phil[i], NULL, philosophe, (void *)&args );
+   for (i = 0; i < PHILOSOPHES; i++) {
+     err=pthread_create(&phil[i], NULL, philosophe, (void*)&(id[i]) );
      if(err!=0)
        error(err,"pthread_create");
    }
 
-   for (int i = 0; i < args.PHILOSOPHES; i++) {
+   for (i = 0; i < PHILOSOPHES; i++) {
       pthread_join(phil[i], NULL);
       if(err!=0)
 	error(err,"pthread_join");
    }
 
-   for (int i = 0; i < args.PHILOSOPHES; i++) {
+   for (i = 0; i < PHILOSOPHES; i++) {
       pthread_mutex_destroy(&baguette[i]);
       if(err!=0)
 	error(err,"pthread_mutex_destroy");
