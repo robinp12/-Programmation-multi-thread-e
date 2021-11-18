@@ -10,7 +10,6 @@
 
 static pthread_mutex_t baguette[PHILOSOPHES];
 
-
 void error(int err, char *msg) {
   fprintf(stderr,"%s a retourné %d message d'erreur : %s\n",msg,err,strerror(errno));
   exit(EXIT_FAILURE);
@@ -22,8 +21,6 @@ void mange(int id) {
     // philosophe mange
   }
 }
-
-///AAA
 
 void* philosophe ( void* arg )
 {
@@ -46,41 +43,41 @@ void* philosophe ( void* arg )
   }
   return (NULL);
 }
-///BBB
+
 int main ( int argc, char *argv[])
 {
-   int i;
-   int id[PHILOSOPHES];
-   int err;
-   pthread_t phil[PHILOSOPHES];
+  if(argc<2){
+    printf("\n Argument manquant (int) \n");
+  }
+  int nbr_philo = atoi(argv[1]);
+  int id[nbr_philo];
+  int err;
+  
+  pthread_t phil[nbr_philo];
 
-   srand(getpid());
+  srand(getpid());
 
-   for (i = 0; i < PHILOSOPHES; i++)
-     id[i]=i;
+  for (int i = 0; i < nbr_philo; i++)
+    id[i]=i;
 
-   for (i = 0; i < PHILOSOPHES; i++) {
-     err=pthread_mutex_init( &baguette[i], NULL);
-      if(err!=0)
-	error(err,"pthread_mutex_init");
-   }
+  for (int i = 0; i < nbr_philo; i++) {
+    err=pthread_mutex_init( &baguette[i], NULL);
+    if(err!=0) error(err,"pthread_mutex_init");
+  }
 
-   for (i = 0; i < PHILOSOPHES; i++) {
-     err=pthread_create(&phil[i], NULL, philosophe, (void*)&(id[i]) );
-     if(err!=0)
-       error(err,"pthread_create");
-   }
+  for (int i = 0; i < nbr_philo; i++) {
+    err=pthread_create(&phil[i], NULL, philosophe, (void*)&(id[i]) );
+    if(err!=0) error(err,"pthread_create");
+  }
 
-   for (i = 0; i < PHILOSOPHES; i++) {
-      pthread_join(phil[i], NULL);
-      if(err!=0)
-	error(err,"pthread_join");
-   }
+  for (int i = 0; i < nbr_philo; i++) {
+    pthread_join(phil[i], NULL);
+    if(err!=0) error(err,"pthread_join");
+  }
 
-   for (i = 0; i < PHILOSOPHES; i++) {
+   for (int i = 0; i < nbr_philo; i++) {
       pthread_mutex_destroy(&baguette[i]);
-      if(err!=0)
-	error(err,"pthread_mutex_destroy");
+      if(err!=0) error(err,"pthread_mutex_destroy");
    }
 
    return (EXIT_SUCCESS);
