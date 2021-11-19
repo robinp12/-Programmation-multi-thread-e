@@ -23,7 +23,6 @@ void mange(int id) {
   }
 }
 
-// Fonction appelée dans le thread
 void* philosophe ( void* arg )
 {
   int *id=(int *) arg;
@@ -50,46 +49,39 @@ void* philosophe ( void* arg )
 int main ( int argc, char *argv[])
 {
   int err;
-
   // Vérifie le nombre d'arguments
   if(argc<2){
     printf("\n Argument manquant (int) \n");
   }
   nbr_philo = atoi(argv[1]);
-
-  // Alloue un espace memoire pour les id's
   int* id = malloc(sizeof(int) * nbr_philo);
   if(id == NULL){error(err,"malloc_id");}
 
+  
   pthread_t phil[nbr_philo];
-
-// Alloue un espace memoire pour les baguettes
   baguette = malloc(sizeof(pthread_mutex_t) * nbr_philo);
   if(baguette == NULL){error(err,"malloc_baguette");}
 
   srand(getpid());
-  
-  // Alloue un id
+
   for (int i = 0; i < nbr_philo; i++)
     id[i]=i;
 
-  // Initialiser mutex
   for (int i = 0; i < nbr_philo; i++) {
     err=pthread_mutex_init( &baguette[i], NULL);
     if(err!=0) error(err,"pthread_mutex_init");
   }
-  // Creer thread
+
   for (int i = 0; i < nbr_philo; i++) {
     err=pthread_create(&phil[i], NULL, philosophe, (void*)&(id[i]) );
     if(err!=0) error(err,"pthread_create");
   }
-  // Join thread
+
   for (int i = 0; i < nbr_philo; i++) {
     pthread_join(phil[i], NULL);
     if(err!=0) error(err,"pthread_join");
   }
 
-  // Detruire mutex
    for (int i = 0; i < nbr_philo; i++) {
       pthread_mutex_destroy(&baguette[i]);
       if(err!=0) error(err,"pthread_mutex_destroy");
