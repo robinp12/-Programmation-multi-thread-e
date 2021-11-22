@@ -49,6 +49,7 @@ void* philosophe ( void* arg )
 int main ( int argc, char *argv[])
 {
   int err;
+  int nb_baguette;
   // Vérifie le nombre d'arguments
   if(argc<2){
     printf("\n Argument manquant (int) \n");
@@ -57,9 +58,14 @@ int main ( int argc, char *argv[])
   int* id = malloc(sizeof(int) * nbr_philo);
   if(id == NULL){error(err,"malloc_id");}
 
-  
   pthread_t phil[nbr_philo];
-  baguette = malloc(sizeof(pthread_mutex_t) * nbr_philo);
+  nb_baguette = nbr_philo;
+  
+  if(nbr_philo == 1){
+    nb_baguette = 2;
+  }
+  
+  baguette = malloc(sizeof(pthread_mutex_t) * nb_baguette);
   if(baguette == NULL){error(err,"malloc_baguette");}
 
   srand(getpid());
@@ -67,7 +73,7 @@ int main ( int argc, char *argv[])
   for (int i = 0; i < nbr_philo; i++)
     id[i]=i;
 
-  for (int i = 0; i < nbr_philo; i++) {
+  for (int i = 0; i < nb_baguette; i++) {
     err=pthread_mutex_init( &baguette[i], NULL);
     if(err!=0) error(err,"pthread_mutex_init");
   }
@@ -82,14 +88,16 @@ int main ( int argc, char *argv[])
     if(err!=0) error(err,"pthread_join");
   }
 
-   for (int i = 0; i < nbr_philo; i++) {
+   for (int i = 0; i < nb_baguette; i++) {
       pthread_mutex_destroy(&baguette[i]);
       if(err!=0) error(err,"pthread_mutex_destroy");
    }
 
    //Liberer la mémoire allouée par les mallocs
-   free(baguette);
-   free(id);
-
-   return (EXIT_SUCCESS);
+  free(baguette);
+  baguette=NULL;
+  free(id);
+  id=NULL;
+  
+  return (EXIT_SUCCESS);
 }
