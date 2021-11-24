@@ -8,7 +8,7 @@
 
 int nbr_philo;
 pthread_mutex_t * baguette;
-int cycles = 10000;
+int cycles = 100000;
 
 // Custom message d'erreur
 void error(int err, char *msg) {
@@ -67,8 +67,6 @@ int main ( int argc, char *argv[])
   
   baguette = malloc(sizeof(pthread_mutex_t) * nb_baguette);
   if(baguette == NULL){error(err,"malloc_baguette");}
-
-  srand(getpid());
 
   for (int i = 0; i < nbr_philo; i++)
     id[i]=i;
