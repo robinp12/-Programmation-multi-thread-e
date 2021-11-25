@@ -3,41 +3,61 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+
+#define MAX_READS 2560
+#define MAX_WRITES 640
 
 sem_t db;
 int readcount = 0;
 int writecount = 0;
+int writing = 640; 
+int reading = 2560;
+
 pthread_mutex_t mutex_readcount;
 pthread_mutex_t mutex_writecount;
 pthread_mutex_t mutex_writedb;
 pthread_mutex_t mutex_readdb;
 pthread_mutex_t z;
 
-sem_t wsem;
+sem_t wsem; 
 sem_t rsem;
 
 // Custom message d'erreur
 void error(int err, char *msg) {
-  fprintf(stderr,"%s a retourné %d message d'erreur : %s\n",msg,err);
+  fprintf(stderr,"%s a retourné %d message d'erreur : %s\n",msg,err,strerror(errno));
   exit(EXIT_FAILURE);
 }
 
 int write_database(){
-        pthread_mutex_lock(&mutex_writedb);
-
-        pthread_mutex_unlock(&mutex_writedb);
+    printf("write database\n");
 }
 
 int read_database(){
-        pthread_mutex_lock(&mutex_readdb);
-
-        pthread_mutex_unlock(&mutex_readdb);
+    printf("read database\n");
+}
+void process_data(){
+  while(rand() > RAND_MAX/10000);
+}
+void prepare_data(){
+  while(rand() > RAND_MAX/10000);
 }
 void *reader(){
     while(true){
         pthread_mutex_lock(&z);
             sem_wait(&rsem);
             pthread_mutex_lock(&mutex_readcount);
+                if(reading <= 0){
+                    pthread_mutex_unlock(&mutex_readcount);
+                    sem_post(&rsem);
+                    pthread_mutex_unlock(&z);
+
+                    break;
+                }
+                else{
+                    reading--;
+                }
                 // exclusion mutuelle, readercount
                 readcount=readcount+1;
                 if (readcount==1) {
@@ -56,12 +76,20 @@ void *reader(){
                 sem_post(&wsem);
             }
         pthread_mutex_unlock(&mutex_readcount);
+        process_data();
     }
 }
 void *writer(){
     while(true){
-
+        prepare_data();
         pthread_mutex_lock(&mutex_writecount);
+            if(writing <= 0){
+                pthread_mutex_unlock(&mutex_writecount);
+                break;
+            }
+            else{
+                writing--;
+            }
             // section critique - writecount
             writecount=writecount+1;
             if(writecount==1) {
@@ -89,8 +117,12 @@ int main (int argc, char *argv[]){
     int err;
     int reader_thread;
     int writer_thread;
-    if(argc != 3){
-        printf("\n 2 arguments requis (int) \n");
+    if(argc != 3 
+    || (atoi(argv[1])<1 
+    || atoi(argv[2])<1)){
+        printf("\n# 2 arguments required greater than 0 # \n");
+        printf("First argument (int) for reader \n");
+        printf("Second argument (int) for writer \n");
         return 0;
     }
     reader_thread = atoi(argv[1]);

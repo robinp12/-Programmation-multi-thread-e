@@ -1,7 +1,7 @@
 ﻿#!/bin/bash
 thread=$(($(nproc)*2))
 
-for file in *.exe;
+for file in *.o;
 do
 	output="out/${file}.csv"
 	echo "nb_thread,elapsed_secs" > $output
@@ -10,7 +10,7 @@ do
 	do
 		for i in {1..5}
 		do
-			time=$({ /usr/bin/time -f "$NTHREAD, %e" ./$file 10 make -s -j $NTHREAD; } 2>&1|tail -n 1))
+			time=$(/usr/bin/time -f %e ./$file $i 2>&1|tail -n 1)
 			
 			echo "$i,$time" >> $output
 			make clean -s

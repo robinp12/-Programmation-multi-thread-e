@@ -52,7 +52,7 @@ int main ( int argc, char *argv[])
   int nb_baguette;
   // Vérifie le nombre d'arguments
   if(argc<2){
-    printf("\n Argument manquant (int) \n");
+    printf("\n Argument required (int) \n");
   }
   nbr_philo = atoi(argv[1]);
   int* id = malloc(sizeof(int) * nbr_philo);

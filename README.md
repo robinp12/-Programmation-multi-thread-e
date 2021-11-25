@@ -1,3 +1,12 @@
-# -Programmation multi-threadée
+# Programmation multi-thread
 
-Argument de type int attendu en ligne de commande
+
+#### Compile philosophe 
+
+> gcc philosopheProblem.c -o philosopheProblem.o -pthread
+
+#### Run philosophe 
+
+> ./philosopheProblem.o 10
+
+###### Argument of type `int` expected on the command line
