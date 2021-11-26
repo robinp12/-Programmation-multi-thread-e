@@ -94,11 +94,13 @@ void work() {
 }
 
 void produce() {
+    printf("producing\n");
     buffer[nb_produced_elements % BUFFER_SIZE] = rand();
     nb_produced_elements++;
 }
 
 void consume() {
+    printf("consuming\n");
     buffer[nb_consumed_elements % BUFFER_SIZE] = 0;
     nb_consumed_elements++;
     work();

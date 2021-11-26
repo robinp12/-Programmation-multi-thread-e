@@ -1,12 +1,12 @@
 ﻿#!/bin/bash
-thread=$(($(nproc)*2))
+nb_cores=$(($(nproc)*2))
 
-for file in *.o;
+for file in *.exe;
 do
 	output="out/${file}.csv"
 	echo "nb_thread,elapsed_secs" > $output
 
-	for ((nb_thread=1;nb_thread<=thread;++nb_thread))
+	for ((nb_thread=1;nb_thread<=nb_cores;++nb_thread))
 	do
 		for i in {1..5}
 		do

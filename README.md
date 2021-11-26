@@ -1,12 +1,9 @@
 # Programmation multi-thread
 
+#### Compile philosophers.c
 
-#### Compile philosophe 
+`gcc task_1/philosophers.c -Wall -Werror -pthread -o philosophers.exe`
 
-> gcc philosopheProblem.c -o philosopheProblem.o -pthread
+#### Run philosophers.c
 
-#### Run philosophe 
-
-> ./philosopheProblem.o 10
-
-###### Argument of type `int` expected on the command line
+`./philosophers.exe <nb philosophers>`
