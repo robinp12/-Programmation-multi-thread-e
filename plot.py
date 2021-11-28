@@ -1,7 +1,9 @@
 ﻿import matplotlib.pyplot as plt
 import csv
+import glob
 
-def make_figure(file):
+#def make_figure(file):
+for file in glob.glob('*.o'):
     data = {}
     fig1 = plt.figure()
     with open('out/'+file+'.csv') as csvfile:
@@ -21,9 +23,11 @@ def make_figure(file):
 
     x = list(data.keys())
     y = [sum(v) / len(v) for v in data.values()]
+    M = [i for i in range(0,12)]
+
 
     # On trace la température moyenne en fonction du mois en bleu avec un trait plein de 1 pixel d'épaisseur
-    plt.plot(x, y, color="grey", linewidth=1.0, linestyle="-")
+    plt.plot(M, y, color="grey", linewidth=1.0, linestyle="-")
     plt.ylim(ymin=0)
     plt.title("Temps moyen de compilation")
     plt.xlabel("Nombre de thread")
@@ -37,7 +41,6 @@ def make_figure(file):
 
     # on enregistre le graphique. L'extension est directement déduite du nom donné en argument (png par défault).
     plt.savefig("graphs/"+file+".png")
-    plt.savefig("graphs/"+file+".pdf")
 
     #  on affiche le graphe à l'écran (note: show est un appel bloquant, tant que le graphe n'est pas fermé, on est bloqué)
     plt.show()
@@ -45,8 +48,9 @@ def make_figure(file):
     # On ferme proprement le plot.
     plt.close()
 
-file = "philosopheProblem.o"
-try:
-    make_figure("philosopheProblem.o")
-except:
-    print("No such file")
+
+#for file in glob.glob('*.o'):
+#    try:
+#        make_figure(file)
+#    except:
+#        print("No such file :" + file)

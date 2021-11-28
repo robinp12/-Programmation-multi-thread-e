@@ -7,9 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_READS 2560
-#define MAX_WRITES 640
-
 sem_t db;
 int readcount = 0;
 int writecount = 0;
@@ -50,28 +47,28 @@ void prepare_data() {
 void *reader(void *args) {
     while (true) {
         pthread_mutex_lock(&z);
-        sem_wait(&rsem);
-        pthread_mutex_lock(&mutex_readcount);
+            sem_wait(&rsem);
+            pthread_mutex_lock(&mutex_readcount);
 
-        if (reading <= 0) {
+            if (reading <= 0) {
+                pthread_mutex_unlock(&mutex_readcount);
+                sem_post(&rsem);
+                pthread_mutex_unlock(&z);
+
+                break;
+            } else {
+                reading--;
+            }
+
+            // exclusion mutuelle, readercount
+            readcount = readcount + 1;
+            if (readcount == 1) {
+                // arrivée du premier reader
+                sem_wait(&wsem);
+            }
+
             pthread_mutex_unlock(&mutex_readcount);
-            sem_post(&rsem);
-            pthread_mutex_unlock(&z);
-
-            break;
-        } else {
-            reading--;
-        }
-
-        // exclusion mutuelle, readercount
-        readcount = readcount + 1;
-        if (readcount == 1) {
-            // arrivée du premier reader
-            sem_wait(&wsem);
-        }
-
-        pthread_mutex_unlock(&mutex_readcount);
-        sem_post(&rsem);  // libération du prochain reader
+            sem_post(&rsem);  // libération du prochain reader
         pthread_mutex_unlock(&z);
         read_database();
         pthread_mutex_lock(&mutex_readcount);

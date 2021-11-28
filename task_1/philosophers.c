@@ -19,10 +19,6 @@ void print_error(int err, char *msg) {
 
 void eat(int id) {
     printf("Philosophe [%d] mange\n", id);
-
-    for (int i = 0; i < rand(); i++) {
-        // philosophe mange
-    }
 }
 
 void *philosophe(void *arg) {

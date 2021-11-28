@@ -2,7 +2,7 @@
 
 #### Compile philosophers.c
 
-`gcc task_1/philosophers.c -Wall -Werror -pthread -o philosophers.exe`
+`gcc task_1/philosophers.c -Wall -Werror -pthread -o philosophers.o`
 
 #### Run philosophers.c
 
