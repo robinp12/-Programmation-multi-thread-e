@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdbool.h>
@@ -6,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <errno.h>
 
 #define MAX_NB_ELEMENTS 1024
 #define BUFFER_SIZE 8
@@ -70,12 +70,12 @@ int main(int argc, char *argv[]) {
 
     err = pthread_mutex_init(&mutex, NULL);
     if (err != 0) print_error(err, "mutex_init");
-    
+
     err = sem_init(&empty, 0, BUFFER_SIZE);
     if (err != 0) print_error(err, "sem_init empty");
     err = sem_init(&full, 0, 0);
     if (err != 0) print_error(err, "sem_init full");
-    
+
     for (int i = 0; i < nb_producers; i++) {
         err = pthread_create(&producers[i], NULL, (void *)producer, (void *)&i);
         if (err != 0) print_error(err, "pthread_create producer");
@@ -136,6 +136,7 @@ void producer() {
         if (nb_produced_elements == MAX_NB_ELEMENTS) {
             pthread_mutex_unlock(&mutex);
             sem_post(&full);
+            return;
         }
 
         produce();
@@ -152,6 +153,7 @@ void consumer() {
         if (nb_consumed_elements == MAX_NB_ELEMENTS) {
             pthread_mutex_unlock(&mutex);
             sem_post(&empty);
+            return;
         }
 
         consume();
