@@ -1,9 +1,21 @@
 # Programmation multi-thread
 
-#### Compile philosophers.c
+### Run project (linux)
 
-`gcc task_1/philosophers.c -Wall -Werror -pthread -o philosophers.o`
+`make all`
 
-#### Run philosophers.c
+#### Compile (file).c
 
-`./philosophers.exe <nb philosophers>`
+`gcc task_1/(file).c -Wall -Werror -pthread -o (file).o`
+
+#### Run (file).c
+
+`./(file).o <nb>`
+
+#### Make performance
+
+`bash .\time_perf.sh`
+
+#### Make performance
+
+`python plot.py`
