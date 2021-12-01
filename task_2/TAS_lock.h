@@ -9,7 +9,7 @@ int init_TAS(LockTAS **lock) {
     *lock = malloc(sizeof(LockTAS));
 
     if (*lock == NULL) {
-        return 1;
+        return -1;
     }
 
     (*lock)->state = 0;

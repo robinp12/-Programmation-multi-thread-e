@@ -22,6 +22,7 @@ pthread_mutex_t z;
 sem_t wsem;
 sem_t rsem;
 
+// Fonction pour retourner les erreurs
 void print_error(int err, char *msg) {
     fprintf(stderr, "'%s' returned error %d with message '%s'\n", msg, err,
             strerror(errno));
@@ -132,6 +133,7 @@ int main(int argc, char *argv[]) {
     int nb_reader_threads;
     int nb_writer_threads;
 
+    // Verification des arguments
     if (argc != 3) {
         printf("Error, expected two arguments, but received %d.", (argc - 1));
         exit(EXIT_FAILURE);
@@ -164,6 +166,7 @@ int main(int argc, char *argv[]) {
     pthread_t thread_read[nb_reader_threads];
     pthread_t thread_write[nb_writer_threads];
 
+    // Initialisation des mutex
     err = pthread_mutex_init(&mutex_readcount, NULL);
     if (err != 0) print_error(err, "mutex_init readcount");
     err = pthread_mutex_init(&mutex_writecount, NULL);
@@ -175,11 +178,13 @@ int main(int argc, char *argv[]) {
     err = pthread_mutex_init(&z, NULL);
     if (err != 0) print_error(err, "mutex_init z");
 
+    // Initialisation des semaphores read / write
     err = sem_init(&wsem, 0, 1);
     if (err != 0) print_error(err, "sem_init write");
     err = sem_init(&rsem, 0, 1);
     if (err != 0) print_error(err, "sem_init read");
 
+    // Creation des thread reader / writer
     for (int i = 0; i < nb_reader_threads; i++) {
         err = pthread_create(&thread_read[i], NULL, reader, NULL);
         if (err != 0) print_error(err, "pthread_create reader");
@@ -198,6 +203,7 @@ int main(int argc, char *argv[]) {
         if (err != 0) print_error(err, "pthread_create writer");
     }
 
+    // Destruction des mutex
     err = pthread_mutex_destroy(&mutex_readcount);
     if (err != 0) {
         print_error(err, "mutex_destroy mutex_readcount");
@@ -219,6 +225,7 @@ int main(int argc, char *argv[]) {
         print_error(err, "mutex_destroy z");
     }
 
+    // Destruction des semaphores
     err = sem_destroy(&wsem);
     if (err != 0) print_error(err, "sem_destroy write");
     err = sem_destroy(&rsem);

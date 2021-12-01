@@ -9,6 +9,6 @@ readerWriter:
 performances:
 		bash time_perf.sh
 graphs:
-		python plot.py
+		python3 plot.py
 clean:
 		#rm out/*

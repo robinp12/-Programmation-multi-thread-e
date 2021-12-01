@@ -25,6 +25,7 @@ int buffer[BUFFER_SIZE];
 int nb_produced_elements = 0;
 int nb_consumed_elements = 0;
 
+// Fonction pour retourner les erreurs
 void print_error(int err, char *msg) {
     fprintf(stderr, "'%s' returned error %d with message '%s'\n", msg, err,
             strerror(errno));
@@ -36,6 +37,7 @@ int main(int argc, char *argv[]) {
     int nb_consumers;
     int err;
 
+    // Verification des arguments
     if (argc != 3) {
         printf("Error, expected two arguments, but received %d.", (argc - 1));
         exit(EXIT_FAILURE);
@@ -68,19 +70,23 @@ int main(int argc, char *argv[]) {
     pthread_t producers[nb_producers];
     pthread_t consumers[nb_consumers];
 
+    // Initialisation du mutex
     err = pthread_mutex_init(&mutex, NULL);
     if (err != 0) print_error(err, "mutex_init");
 
+    // Initialisation des semaphores
     err = sem_init(&empty, 0, BUFFER_SIZE);
     if (err != 0) print_error(err, "sem_init empty");
     err = sem_init(&full, 0, 0);
     if (err != 0) print_error(err, "sem_init full");
 
+    // Creation des threads producteur
     for (int i = 0; i < nb_producers; i++) {
         err = pthread_create(&producers[i], NULL, (void *)producer, (void *)&i);
         if (err != 0) print_error(err, "pthread_create producer");
     }
 
+    // Creation des threads consomateurs
     for (int i = 0; i < nb_consumers; i++) {
         err = pthread_create(&consumers[i], NULL, (void *)consumer, (void *)&i);
         if (err != 0) print_error(err, "pthread_create consumer");
@@ -96,11 +102,13 @@ int main(int argc, char *argv[]) {
         if (err != 0) print_error(err, "pthread_create consumers");
     }
 
+    // Destruction des mutex
     err = pthread_mutex_destroy(&mutex);
     if (err != 0) {
         print_error(err, "mutex_destroy mutex");
     }
 
+    // Destruction des semaphores
     err = sem_destroy(&empty);
     if (err != 0) print_error(err, "sem_destroy empty");
     err = sem_destroy(&full);
