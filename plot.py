@@ -31,7 +31,7 @@ for file in glob.glob('**/*.o.csv'):
     plt.ylim(bottom=0)
     
     # Ajouter des titres
-    plt.title("Temps moyen de compilation : " + file[4:-6])
+    plt.title("Temps d'exécution moyen en fonction du nombre de threads : " + file[4:-6])
     plt.xlabel("Nombre de thread")
     plt.ylabel("Temps d'exécution moyen (sec)")
 
