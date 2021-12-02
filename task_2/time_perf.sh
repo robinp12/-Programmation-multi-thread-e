@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Appel systeme pour le nombre de coeurs
+thread=$(nproc)
+
+make clean2
+
+# Effectuer la tache pour chaque fichier ".o"
+for file in *.o;
+do
+	if [ $file != "*.o" ]
+	then
+		# Initialiser un nouveau fichier csv
+		output="out/task_2/${file}.csv"
+		touch $output
+
+		# Boucle pour les headers
+		for ((nb_thread=1;nb_thread<=thread;++nb_thread))
+		do
+			if [ $nb_thread == $thread ]
+			then
+				echo "$nb_thread," >> $output
+			else
+				echo -n "$nb_thread," >> $output
+			fi
+		done
+
+		# Boucle pour les cinq mesures
+		for i in {1..5}
+		do
+			# Boucle pour chaque thread
+			for ((nb_thread=1;nb_thread<=thread;++nb_thread))
+			do
+				# Mesure du temps d'execution pour les differents fichiers
+				time=$(/usr/bin/time -f %e ./$file $nb_thread*2 2>&1|tail -n 1)
+
+				# Ecrire le resultat dans le fichier
+				if [ $nb_thread == $thread ]
+				then
+					echo "$time," >> $output
+				else
+					echo -n "$time," >> $output
+				fi
+			done
+		done
+	fi
+done

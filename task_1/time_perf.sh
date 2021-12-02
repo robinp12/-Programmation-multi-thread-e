@@ -1,7 +1,9 @@
-﻿#!/bin/bash
+#!/bin/bash
 
-# Appel systeme pour le nombre de thread * 2 
+# Appel systeme pour le nombre de coeurs
 thread=$(nproc)
+
+make clean1
 
 # Effectuer la tache pour chaque fichier ".o"
 for file in *.o;
@@ -9,8 +11,8 @@ do
 	if [ $file != "*.o" ]
 	then
 		# Initialiser un nouveau fichier csv
-		output="out/${file}.csv"
-		echo -n "" > $output
+		output="out/task_1/${file}.csv"
+		touch $output
 
 		# Boucle pour les headers
 		for ((nb_thread=1;nb_thread<=thread;++nb_thread))
@@ -23,14 +25,14 @@ do
 			fi
 		done
 
-		# Boucle pour les cinqs mesures
+		# Boucle pour les cinq mesures
 		for i in {1..5}
 		do
 			# Boucle pour chaque thread
 			for ((nb_thread=1;nb_thread<=thread;++nb_thread))
 			do
 				# Mesure du temps d'execution pour les differents fichiers
-				# Philosophe prend 1 seul argument
+				# Programme "Philosophes" prend 1 seul argument
 				if [ $file != "philosophers.o" ]
 				then
 					time=$(/usr/bin/time -f %e ./$file $nb_thread*2 $nb_thread*2 2>&1|tail -n 1)
@@ -44,7 +46,6 @@ do
 				else
 					echo -n "$time," >> $output
 				fi
-				make clean -s
 			done
 		done
 	fi
