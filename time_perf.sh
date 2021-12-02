@@ -29,9 +29,9 @@ do
 			# Boucle pour chaque thread
 			for ((nb_thread=1;nb_thread<=thread;++nb_thread))
 			do
-				# Mesure du temps d'execution pour les differents fichiers
+				# Mesure du temps d'execution
 				# Philosophe prend 1 seul argument
-				if [ $file != "philosophers.o" ]
+				if [ $file != "philosophers.o" ] && [ $file != "philosophers2.o" ] 
 				then
 					time=$(/usr/bin/time -f %e ./$file $nb_thread*2 $nb_thread*2 2>&1|tail -n 1)
 				else
@@ -44,7 +44,6 @@ do
 				else
 					echo -n "$time," >> $output
 				fi
-				make clean -s
 			done
 		done
 	fi

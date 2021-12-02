@@ -2,7 +2,7 @@
 
 ### Run project (linux)
 
-`make all`
+`make`
 
 #### Compile (file).c
 
@@ -19,3 +19,7 @@
 #### Make performance
 
 `python plot.py`
+
+#### Clean output files
+
+`make clean`
