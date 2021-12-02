@@ -34,9 +34,9 @@ for file in glob.glob('out/task_2/*.o.csv'):
     # Ajouter des titres
     program_name = ''
     if 'test_and_test_and_set' in file:
-        program_name = ' (Test & Set)'
+        program_name = '(Test & Set)'
     elif 'test_and_set' in file:
-        program_name = ' (Test & Test & Set)'
+        program_name = '(Test & Test & Set)'
 
     plt.title(f'Temps d\'exécution moyen \nen fonction du nombre de threads {program_name}')
     plt.xlabel('Nombre de threads')

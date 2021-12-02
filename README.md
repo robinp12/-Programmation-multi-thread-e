@@ -2,22 +2,30 @@
 
 The project requires having a version of Python 3 installed, along with the Matplotlib, Numpy and Pandas libraries.
 
-### Run project (linux)
+### Run project (on linux)
 
 `make all`
 
-#### Compile (file).c
+### Run the first part of the project
 
-`gcc task_1/(file).c -Wall -Werror -pthread -o (file).o`
+`make task1`
 
-#### Run (file).c
+### Run the second part of the project
 
-`./(file).o <nb>`
+`make task2`
+
+#### Compile <file>.c
+
+`gcc -I -Wall -Werror -std=c99 <file>.c -o <file>.o -pthread`
+
+#### Run <file>.c
+
+`./<file>.o <nb>`
 
 #### Make performance
 
-`bash .\time_perf.sh`
+`bash ./time_perf.sh`
 
 #### Make graphs
 
-`python plot.py`
+`python task_<1 or 2>/plot.py`
