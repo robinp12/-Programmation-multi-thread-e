@@ -4,7 +4,7 @@ The project requires having a version of Python 3 installed, along with the Matp
 
 ### Run project (on linux)
 
-`make all`
+`make`
 
 ### Run the first part of the project
 
@@ -29,3 +29,7 @@ The project requires having a version of Python 3 installed, along with the Matp
 #### Make graphs
 
 `python task_<1 or 2>/plot.py`
+
+#### Clean output files
+
+`make clean`

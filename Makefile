@@ -18,7 +18,12 @@ graphs1:
 clean1:
 		rm out/task_1/** && touch out/task_1/empty
 
-
+philosophers2:
+		gcc -I -Wall -Werror -std=c99 task_2/philosophers.c -o out/task_2/philosophers.o -pthread
+producerConsumer2:
+		gcc -I -Wall -Werror -std=c99 task_2/producerConsumer.c -o out/task_2/producerConsumer.o -pthread
+readerWriter2:
+		gcc -I -Wall -Werror -std=c99 task_2/readerWriter.c -o out/task_2/readerWriter.o -pthread
 test_and_set:
 		gcc -I -Wall -Werror -std=c99 task_2/test_and_set.c -o out/task_2/test_and_set.o -pthread
 test_test_and_set:

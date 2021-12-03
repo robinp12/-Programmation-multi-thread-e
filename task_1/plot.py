@@ -5,8 +5,6 @@ import glob
 
 # Effectuer la tache sur chaque fichier csv
 for file in glob.glob('out/task_1/*.o.csv'):
-    print(file)
-    # Creer les figures
     plt.figure()
 
     # Ouvrir les fichiers
@@ -25,13 +23,6 @@ for file in glob.glob('out/task_1/*.o.csv'):
         ecart[i] = np.std(list(datacsv[i])[1:])
         i = i + 1
 
-    # Tracer la courbe avec la moyenne et l'ecart type
-    plt.errorbar(header, moyenne, ecart, fmt='.-', capsize=5, ecolor='black', label=file[4:-6])
-
-    # Fixer a 0 l'axe Y
-    plt.ylim(bottom=0)
-
-    # Ajouter des titres
     program_name = ''
     if 'philosophers' in file:
         program_name = '(Philosophes)'
@@ -40,15 +31,24 @@ for file in glob.glob('out/task_1/*.o.csv'):
     elif 'reader' in file:
         program_name = '(Lecteurs/Ecrivains)'
 
-    plt.title(f'Temps d\'exécution moyen \nen fonction du nombre de threads {program_name}')
+    # Tracer la courbe avec la moyenne et l'ecart type
+    plt.errorbar(
+        header, moyenne, ecart, fmt='.-', capsize=5, ecolor='black'
+    )
+
+    # Fixer a 0 l'axe Y
+    plt.ylim(bottom=0)
+
+    # Ajouter des titres
+    plt.title(f'Temps d\'exécution moyen\nen fonction du nombre de threads {program_name}')
     plt.xlabel('Nombre de threads')
     plt.ylabel('Temps d\'exécution moyen (sec)')
 
-    # Permet d'ajouter une grille au graphe, rendant la lecture de vos données plus facile.
+    # Permet d'ajouter une grille au graphe, rendant la lecture des données plus facile.
     plt.grid(True)
 
     # Ajouter une légende, loc peut prendre différentes valeurs (https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.legend.html)
-    plt.legend(['Temps d\'execution par thread'], loc = 'upper right')
+    plt.legend(['implémentation POSIX'], loc = 'upper right')
 
     # on enregistre le graphique. L'extension est directement déduite du nom donné en argument (png par défault).
     plt.savefig(f'graphs/{file.replace("out/task_1/", "")}.png')
