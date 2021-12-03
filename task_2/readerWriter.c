@@ -30,9 +30,13 @@ void print_error(int err, char *msg) {
     exit(EXIT_FAILURE);
 }
 
-void write_database() { printf("write database\n"); }
+void write_database() {
+    // printf("write database\n");
+}
 
-void read_database() { printf("read database\n"); }
+void read_database() {
+    // printf("read database\n");
+}
 
 void process_data() {
     while (rand() > RAND_MAX / 10000) {

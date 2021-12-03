@@ -7,8 +7,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "TAS_lock.h"
+
 int nb_philo;
-pthread_mutex_t *baguette;
+LockTAS *baguette;
 int cycles = 100000;
 
 // Fonction pour retourner les erreurs
@@ -19,7 +21,9 @@ void print_error(int err, char *msg) {
 }
 
 // Fonction appelée dans le philosophe
-void eat(int id) { printf("Philosophe [%d] mange\n", id); }
+void eat(int id) {
+    // printf("Philosophe [%d] mange\n", id);
+}
 
 // Fonction appelée dans le thread
 void *philosophe(void *arg) {
@@ -30,17 +34,17 @@ void *philosophe(void *arg) {
     while (cycles >= 0) {
         // philosophe pense
         if (left < right) {
-            pthread_mutex_lock(&baguette[left]);
-            pthread_mutex_lock(&baguette[right]);
+            lock_TAS(&baguette[left]);
+            lock_TAS(&baguette[right]);
         } else {
-            pthread_mutex_lock(&baguette[right]);
-            pthread_mutex_lock(&baguette[left]);
+            lock_TAS(&baguette[right]);
+            lock_TAS(&baguette[left]);
         }
 
         eat(*id);
         cycles--;
-        pthread_mutex_unlock(&baguette[left]);
-        pthread_mutex_unlock(&baguette[right]);
+        unlock_TAS(&baguette[left]);
+        unlock_TAS(&baguette[right]);
     }
 
     return NULL;
@@ -91,7 +95,7 @@ int main(int argc, char *argv[]) {
 
     // Initialisation des mutex
     for (int i = 0; i < nb_baguette; i++) {
-        err = pthread_mutex_init(&baguette[i], NULL);
+        err = init_TAS(&baguette[i], NULL);
         if (err != 0) print_error(err, "pthread_mutex_init");
     }
 
@@ -108,7 +112,7 @@ int main(int argc, char *argv[]) {
 
     // Destruction des mutex
     for (int i = 0; i < nb_baguette; i++) {
-        pthread_mutex_destroy(&baguette[i]);
+        destroy_TAS(&baguette[i]);
         if (err != 0) print_error(err, "pthread_mutex_destroy");
     }
 

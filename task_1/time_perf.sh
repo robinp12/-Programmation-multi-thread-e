@@ -3,20 +3,18 @@
 # Appel systeme pour le nombre de coeurs
 thread=$(nproc)
 
-make clean1
-
 # Effectuer la tache pour chaque fichier ".o"
-for file in *.o;
+for file in out/task_1/*.o;
 do
 	if [ $file != "*.o" ]
 	then
 		# Initialiser un nouveau fichier csv
-		output="out/task_1/${file}.csv"
+		output="${file}.csv"
 		touch $output
-
+		
 		# Boucle pour les headers
 		for ((nb_thread=1;nb_thread<=thread;++nb_thread))
-		do
+		do			
 			if [ $nb_thread == $thread ]
 			then
 				echo "$nb_thread," >> $output
@@ -39,6 +37,7 @@ do
 				else
 					time=$(/usr/bin/time -f %e ./$file $nb_thread*2 2>&1|tail -n 1)
 				fi
+				
 				# Ecrire le resultat dans le fichier
 				if [ $nb_thread == $thread ]
 				then
