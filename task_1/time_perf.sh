@@ -10,8 +10,8 @@ do
 	then
 		# Initialiser un nouveau fichier csv
 		output="${file}.csv"
-		touch $output
-		
+		echo -n "" > $output
+		echo "write time result in $file.csv"
 		# Boucle pour les headers
 		for ((nb_thread=1;nb_thread<=thread;++nb_thread))
 		do			
@@ -31,7 +31,7 @@ do
 			do
 				# Mesure du temps d'execution pour les differents fichiers
 				# Programme "Philosophes" prend 1 seul argument
-				if [ $file != "philosophers.o" ]
+				if [ $file != "out/task_1/philosophers.o" ]
 				then
 					time=$(/usr/bin/time -f %e ./$file $nb_thread*2 $nb_thread*2 2>&1|tail -n 1)
 				else

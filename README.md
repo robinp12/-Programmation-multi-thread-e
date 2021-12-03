@@ -33,3 +33,9 @@ The project requires having a version of Python 3 installed, along with the Matp
 #### Clean output files
 
 `make clean`
+
+![Alt text](/philosophers.o.csv.png?raw=true "Philosophes")
+![Alt text](/producerConsumer.o.csv.png?raw=true "Producteurs/Consommateurs")
+![Alt text](/readerWriter.o.csv.png?raw=true "Lecteurs/Ecrivains")
+![Alt text](/test_and_set.o.csv.png?raw=true "Test & Set")
+

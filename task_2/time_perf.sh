@@ -10,11 +10,12 @@ do
 	then
 		# Initialiser un nouveau fichier csv
 		output="${file}.csv"
-		touch $output
+		echo -n "" > $output
+		echo "write time result in $file.csv"
 
 		# Boucle pour les headers
 		for ((nb_thread=1;nb_thread<=thread;++nb_thread))
-		do
+		do			
 			if [ $nb_thread == $thread ]
 			then
 				echo "$nb_thread," >> $output
@@ -31,13 +32,13 @@ do
 			do
 				# Mesure du temps d'execution pour les differents fichiers
 				# Programme "Philosophes" prend 1 seul argument
-				if [ $file == "philosophers.o" ] || [ $file == "test_and_set.o" ]  || [ $file == "test_and_test_and_set.o" ]
+				if [ $file == "out/task_2/philosophers.o" ] || [ $file == "out/task_2/test_and_set.o" ]  || [ $file == "out/task_2/test_and_test_and_set.o" ]
 				then
 					time=$(/usr/bin/time -f %e ./$file $nb_thread*2 2>&1|tail -n 1)
 				else
 					time=$(/usr/bin/time -f %e ./$file $nb_thread*2 $nb_thread*2 2>&1|tail -n 1)
 				fi
-
+				
 				# Ecrire le resultat dans le fichier
 				if [ $nb_thread == $thread ]
 				then

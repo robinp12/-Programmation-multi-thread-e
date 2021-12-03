@@ -10,7 +10,7 @@ for file in files:
     # Ouvrir fichier tache 1
     headercsv = pd.read_csv(file)
     datacsv = pd.read_csv(file.replace('task_2', 'task_1'), header=None)
-
+    
     # Ouvrir fichier tache 2
     datacsv2 = pd.read_csv(file, header=None)
 
@@ -43,7 +43,7 @@ for file in files:
 
     # Tracer la courbe avec la moyenne et l'ecart type
     plt.errorbar(
-        header, moyenne, ecart, fmt='.-', capsize=5, ecolor='black', label=f'{program_name} (implémentation POSIX)'
+        header, moyenne, ecart, fmt='.-', capsize=4, color='blue', ecolor='grey', label=f'{program_name} (implémentation POSIX)'
     )
     plt.errorbar(
         header, moyenne2, ecart2, fmt='.-', capsize=4, color='orange', ecolor='grey', label=f'{program_name} (notre implémentation)'
@@ -51,6 +51,7 @@ for file in files:
 
     # Fixer a 0 l'axe Y
     plt.ylim(bottom=0)
+    print("write graphs for "+ program_name)
 
     # Ajouter des titres
     plt.title(f'Temps d\'exécution moyen\nen fonction du nombre de threads {program_name}')
@@ -64,7 +65,7 @@ for file in files:
     plt.legend(['implémentation POSIX', 'notre implémentation'], loc = 'upper right')
 
     # on enregistre le graphique. L'extension est directement déduite du nom donné en argument (png par défault).
-    plt.savefig(f'graphs/{file.replace("out/task_2/", "")}.png')
+    plt.savefig(f'{file.replace("out/task_2/", "")}.png')
 
 # On ferme proprement le plot.
 plt.close()

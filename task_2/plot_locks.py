@@ -32,11 +32,12 @@ for e in moyenne:
 
 # Tracer la courbe avec la moyenne et l'ecart type
 plt.errorbar(
-    header, moyenne, ecart, fmt='.-', capsize=5, ecolor='black', label='Test & Set'
+    header, moyenne, ecart, fmt='.-', capsize=4, color='blue', ecolor='grey', label='Test & Set'
 )
 plt.errorbar(
-    header, moyenne2, ecart2, fmt='.-', capsize=5, ecolor='black', label='Test & Test & Set'
+    header, moyenne2, ecart2, fmt='.-', capsize=4, color='orange', ecolor='grey', label='Test & Test & Set'
 )
+print("write graphs for "+ "test_and_set")
 
 # Fixer a 0 l'axe Y
 plt.ylim(bottom=0)
@@ -53,7 +54,7 @@ plt.grid(True)
 plt.legend(['Test & Set', 'Test & Test & Set'], loc = 'upper right')
 
 # on enregistre le graphique. L'extension est directement déduite du nom donné en argument (png par défault).
-plt.savefig(f'graphs/{file1.replace("out/task_2/", "")}.png')
+plt.savefig(f'{file1.replace("out/task_2/", "")}.png')
 
 # On ferme proprement le plot.
 plt.close()

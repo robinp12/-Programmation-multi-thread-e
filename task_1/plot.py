@@ -33,12 +33,13 @@ for file in glob.glob('out/task_1/*.o.csv'):
 
     # Tracer la courbe avec la moyenne et l'ecart type
     plt.errorbar(
-        header, moyenne, ecart, fmt='.-', capsize=5, ecolor='black'
+        header, moyenne, ecart, fmt='.-', capsize=4, color='blue', ecolor='grey',
     )
 
     # Fixer a 0 l'axe Y
     plt.ylim(bottom=0)
-
+    print("write graphs for "+ program_name)
+    
     # Ajouter des titres
     plt.title(f'Temps d\'exécution moyen\nen fonction du nombre de threads {program_name}')
     plt.xlabel('Nombre de threads')
@@ -51,7 +52,7 @@ for file in glob.glob('out/task_1/*.o.csv'):
     plt.legend(['implémentation POSIX'], loc = 'upper right')
 
     # on enregistre le graphique. L'extension est directement déduite du nom donné en argument (png par défault).
-    plt.savefig(f'graphs/{file.replace("out/task_1/", "")}.png')
+    plt.savefig(f'{file.replace("out/task_1/", "")}.png')
 
 # On ferme proprement le plot.
 plt.close()
