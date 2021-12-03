@@ -22,7 +22,7 @@ void print_error(int err, char *msg) {
 
 // Fonction appelée dans le philosophe
 void eat(int id) {
-    // printf("Philosophe [%d] mange\n", id);
+    printf("Philosophe [%d] mange\n", id);
 }
 
 // Fonction appelée dans le thread

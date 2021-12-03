@@ -31,11 +31,11 @@ void print_error(int err, char *msg) {
 }
 
 void write_database() {
-    // printf("write database\n");
+    printf("write database\n");
 }
 
 void read_database() {
-    // printf("read database\n");
+    printf("read database\n");
 }
 
 void process_data() {
