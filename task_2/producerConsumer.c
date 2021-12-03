@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "TAS_lock.h"
 #include "semaphore.h"
 
 #define MAX_NB_ELEMENTS 1024
@@ -18,9 +19,9 @@ void consume();
 void producer();
 void consumer();
 
-pthread_mutex_t mutex;
-prim_sem_t empty;
-prim_sem_t full;
+LockTAS mutex;
+Semaphore empty;
+Semaphore full;
 int buffer[BUFFER_SIZE];
 
 int nb_produced_elements = 0;
@@ -72,13 +73,13 @@ int main(int argc, char *argv[]) {
     pthread_t consumers[nb_consumers];
 
     // Initialisation du mutex
-    err = pthread_mutex_init(&mutex, NULL);
+    err = init_TAS(&mutex);
     if (err != 0) print_error(err, "mutex_init");
 
     // Initialisation des semaphores
-    err = prim_sem_init(&empty, 0, BUFFER_SIZE);
+    err = semaphore_init(&empty, BUFFER_SIZE);
     if (err != 0) print_error(err, "sem_init empty");
-    err = prim_sem_init(&full, 0, 0);
+    err = semaphore_init(&full, 0);
     if (err != 0) print_error(err, "sem_init full");
 
     // Creation des threads producteur
@@ -104,15 +105,12 @@ int main(int argc, char *argv[]) {
     }
 
     // Destruction des mutex
-    err = pthread_mutex_destroy(&mutex);
-    if (err != 0) {
-        print_error(err, "mutex_destroy mutex");
-    }
+    destroy_TAS(&mutex);
 
     // Destruction des semaphores
-    err = prim_sem_destroy(&empty);
+    err = semaphore_destroy(&empty);
     if (err != 0) print_error(err, "sem_destroy empty");
-    err = prim_sem_destroy(&full);
+    err = semaphore_destroy(&full);
     if (err != 0) print_error(err, "sem_destroy full");
 
     exit(EXIT_SUCCESS);
@@ -139,34 +137,34 @@ void consume() {
 
 void producer() {
     while (nb_produced_elements < MAX_NB_ELEMENTS) {
-        prim_sem_wait(&empty);
-        pthread_mutex_lock(&mutex);
+        semaphore_wait(&empty);
+        lock_TAS(&mutex);
 
         if (nb_produced_elements == MAX_NB_ELEMENTS) {
-            pthread_mutex_unlock(&mutex);
-            prim_sem_post(&full);
+            unlock_TAS(&mutex);
+            semaphore_post(&full);
             return;
         }
 
         produce();
-        pthread_mutex_unlock(&mutex);
-        prim_sem_post(&full);
+        unlock_TAS(&mutex);
+        semaphore_post(&full);
     }
 }
 
 void consumer() {
     while (nb_consumed_elements < MAX_NB_ELEMENTS) {
-        prim_sem_wait(&full);
-        pthread_mutex_lock(&mutex);
+        semaphore_wait(&full);
+        lock_TAS(&mutex);
 
         if (nb_consumed_elements == MAX_NB_ELEMENTS) {
-            pthread_mutex_unlock(&mutex);
-            prim_sem_post(&empty);
+            unlock_TAS(&mutex);
+            semaphore_post(&empty);
             return;
         }
 
         consume();
-        pthread_mutex_unlock(&mutex);
-        prim_sem_post(&empty);
+        unlock_TAS(&mutex);
+        semaphore_post(&empty);
     }
 }

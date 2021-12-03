@@ -1,10 +1,10 @@
 ﻿import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import glob
 
 # Effectuer la tache sur chaque fichier csv
-for file in glob.glob('out/task_2/*.o.csv'):
+files = ['out/task_2/philosophers.o.csv', 'out/task_2/producerConsumer.o.csv', 'out/task_2/readerWriter.o.csv']
+for file in files:
     plt.figure()
 
     # Ouvrir fichier tache 1
@@ -34,10 +34,12 @@ for file in glob.glob('out/task_2/*.o.csv'):
         i = i + 1
 
     program_name = ''
-    if 'test_and_test_and_set' in file:
-        program_name = '(Test & Set)'
-    elif 'test_and_set' in file:
-        program_name = '(Test & Test & Set)'
+    if 'philosophers' in file:
+        program_name = '(Philosophes)'
+    elif 'producer' in file:
+        program_name = '(Producteurs/Consommateurs)'
+    elif 'reader' in file:
+        program_name = '(Lecteurs/Ecrivains)'
 
     # Tracer la courbe avec la moyenne et l'ecart type
     plt.errorbar(

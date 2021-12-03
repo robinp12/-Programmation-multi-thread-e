@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 int nb_philo;
-pthread_mutex_t *baguette;
+pthread_mutex_t *baguettes;
 int cycles = 100000;
 
 // Fonction pour retourner les erreurs
@@ -32,17 +32,17 @@ void *philosophe(void *arg) {
     while (cycles >= 0) {
         // philosophe pense
         if (left < right) {
-            pthread_mutex_lock(&baguette[left]);
-            pthread_mutex_lock(&baguette[right]);
+            pthread_mutex_lock(&baguettes[left]);
+            pthread_mutex_lock(&baguettes[right]);
         } else {
-            pthread_mutex_lock(&baguette[right]);
-            pthread_mutex_lock(&baguette[left]);
+            pthread_mutex_lock(&baguettes[right]);
+            pthread_mutex_lock(&baguettes[left]);
         }
 
         eat(*id);
         cycles--;
-        pthread_mutex_unlock(&baguette[left]);
-        pthread_mutex_unlock(&baguette[right]);
+        pthread_mutex_unlock(&baguettes[left]);
+        pthread_mutex_unlock(&baguettes[right]);
     }
 
     return NULL;
@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
         nb_baguette = 2;
     }
     // Allocation memoire pour les baguettes
-    baguette = malloc(sizeof(pthread_mutex_t) * nb_baguette);
-    if (baguette == NULL) {
+    baguettes = malloc(sizeof(pthread_mutex_t) * nb_baguette);
+    if (baguettes == NULL) {
         print_error(-1, "malloc_baguette");
     }
 
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 
     // Initialisation des mutex
     for (int i = 0; i < nb_baguette; i++) {
-        err = pthread_mutex_init(&baguette[i], NULL);
+        err = pthread_mutex_init(&baguettes[i], NULL);
         if (err != 0) print_error(err, "pthread_mutex_init");
     }
 
@@ -110,13 +110,13 @@ int main(int argc, char *argv[]) {
 
     // Destruction des mutex
     for (int i = 0; i < nb_baguette; i++) {
-        pthread_mutex_destroy(&baguette[i]);
+        pthread_mutex_destroy(&baguettes[i]);
         if (err != 0) print_error(err, "pthread_mutex_destroy");
     }
 
     // Liberer la mémoire allouée par les mallocs
-    free(baguette);
-    baguette = NULL;
+    free(baguettes);
+    baguettes = NULL;
     free(id);
     id = NULL;
 

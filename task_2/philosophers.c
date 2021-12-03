@@ -10,7 +10,7 @@
 #include "TAS_lock.h"
 
 int nb_philo;
-LockTAS *baguette;
+LockTAS *baguettes;
 int cycles = 100000;
 
 // Fonction pour retourner les erreurs
@@ -21,9 +21,7 @@ void print_error(int err, char *msg) {
 }
 
 // Fonction appelée dans le philosophe
-void eat(int id) {
-    printf("Philosophe [%d] mange\n", id);
-}
+void eat(int id) { printf("Philosophe [%d] mange\n", id); }
 
 // Fonction appelée dans le thread
 void *philosophe(void *arg) {
@@ -34,17 +32,17 @@ void *philosophe(void *arg) {
     while (cycles >= 0) {
         // philosophe pense
         if (left < right) {
-            lock_TAS(&baguette[left]);
-            lock_TAS(&baguette[right]);
+            lock_TAS(&baguettes[left]);
+            lock_TAS(&baguettes[right]);
         } else {
-            lock_TAS(&baguette[right]);
-            lock_TAS(&baguette[left]);
+            lock_TAS(&baguettes[right]);
+            lock_TAS(&baguettes[left]);
         }
 
         eat(*id);
         cycles--;
-        unlock_TAS(&baguette[left]);
-        unlock_TAS(&baguette[right]);
+        unlock_TAS(&baguettes[left]);
+        unlock_TAS(&baguettes[right]);
     }
 
     return NULL;
@@ -86,8 +84,8 @@ int main(int argc, char *argv[]) {
         nb_baguette = 2;
     }
     // Allocation memoire pour les baguettes
-    baguette = malloc(sizeof(pthread_mutex_t) * nb_baguette);
-    if (baguette == NULL) {
+    baguettes = malloc(sizeof(LockTAS) * nb_baguette);
+    if (baguettes == NULL) {
         print_error(-1, "malloc_baguette");
     }
 
@@ -95,7 +93,7 @@ int main(int argc, char *argv[]) {
 
     // Initialisation des mutex
     for (int i = 0; i < nb_baguette; i++) {
-        err = init_TAS(&baguette[i], NULL);
+        err = init_TAS(&baguettes[i]);
         if (err != 0) print_error(err, "pthread_mutex_init");
     }
 
@@ -112,13 +110,13 @@ int main(int argc, char *argv[]) {
 
     // Destruction des mutex
     for (int i = 0; i < nb_baguette; i++) {
-        destroy_TAS(&baguette[i]);
+        destroy_TAS(&baguettes[i]);
         if (err != 0) print_error(err, "pthread_mutex_destroy");
     }
 
     // Liberer la mémoire allouée par les mallocs
-    free(baguette);
-    baguette = NULL;
+    free(baguettes);
+    baguettes = NULL;
     free(id);
     id = NULL;
 

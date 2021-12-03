@@ -28,11 +28,11 @@ clean1:
 
 
 philosophers2:
-		gcc -I -Wall -Werror -std=c99 task_2/philosophers.c -o out/task_2/philosophers.o -pthread
+		gcc -I -Wall -Werror task_2/philosophers.c -o out/task_2/philosophers.o -pthread
 producerConsumer2:
-		gcc -I -Wall -Werror -std=c99 task_2/producerConsumer.c -o out/task_2/producerConsumer.o -pthread
+		gcc -I -Wall -Werror task_2/producerConsumer.c -o out/task_2/producerConsumer.o -pthread
 readerWriter2:
-		gcc -I -Wall -Werror -std=c99 task_2/readerWriter.c -o out/task_2/readerWriter.o -pthread
+		gcc -I -Wall -Werror task_2/readerWriter.c -o out/task_2/readerWriter.o -pthread
 test_and_set:
 		gcc -I -Wall -Werror task_2/test_and_set.c -o out/task_2/test_and_set.o -pthread
 test_test_and_set:
@@ -40,6 +40,6 @@ test_test_and_set:
 perf2:
 		bash task_2/time_perf.sh
 graphs2:
-		python3 task_2/plot.py
+		python3 task_2/plot.py && python3 task_2/plot_locks.py 
 clean2:
 		rm out/task_2/** && touch out/task_2/empty
