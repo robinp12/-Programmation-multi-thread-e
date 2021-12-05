@@ -15,11 +15,11 @@ int writecount = 0;
 int writing = 640;
 int reading = 2560;
 
-LockTAS mutex_readcount;
-LockTAS mutex_writecount;
-LockTAS mutex_writedb;
-LockTAS mutex_readdb;
-LockTAS z;
+LockTAS *mutex_readcount;
+LockTAS *mutex_writecount;
+LockTAS *mutex_writedb;
+LockTAS *mutex_readdb;
+LockTAS *z;
 
 Semaphore wsem;
 Semaphore rsem;
@@ -49,14 +49,14 @@ void prepare_data() {
 
 void *reader(void *args) {
     while (true) {
-        lock_TAS(&z);
+        lock_TAS(z);
         semaphore_wait(&rsem);
-        lock_TAS(&mutex_readcount);
+        lock_TAS(mutex_readcount);
 
         if (reading <= 0) {
-            unlock_TAS(&mutex_readcount);
+            unlock_TAS(mutex_readcount);
             semaphore_post(&rsem);
-            unlock_TAS(&z);
+            unlock_TAS(z);
 
             break;
         } else {
@@ -70,11 +70,11 @@ void *reader(void *args) {
             semaphore_wait(&wsem);
         }
 
-        unlock_TAS(&mutex_readcount);
+        unlock_TAS(mutex_readcount);
         semaphore_post(&rsem);  // libération du prochain reader
-        unlock_TAS(&z);
+        unlock_TAS(z);
         read_database();
-        lock_TAS(&mutex_readcount);
+        lock_TAS(mutex_readcount);
 
         // exclusion mutuelle, readcount
         readcount = readcount - 1;
@@ -83,7 +83,7 @@ void *reader(void *args) {
             semaphore_post(&wsem);
         }
 
-        unlock_TAS(&mutex_readcount);
+        unlock_TAS(mutex_readcount);
         process_data();
     }
 
@@ -93,10 +93,10 @@ void *reader(void *args) {
 void *writer(void *args) {
     while (true) {
         prepare_data();
-        lock_TAS(&mutex_writecount);
+        lock_TAS(mutex_writecount);
 
         if (writing <= 0) {
-            unlock_TAS(&mutex_writecount);
+            unlock_TAS(mutex_writecount);
             break;
         } else {
             writing--;
@@ -109,13 +109,13 @@ void *writer(void *args) {
             semaphore_wait(&rsem);
         }
 
-        unlock_TAS(&mutex_writecount);
+        unlock_TAS(mutex_writecount);
         semaphore_wait(&wsem);
 
         // section critique, un seul writer à la fois
         write_database();
         semaphore_post(&wsem);
-        lock_TAS(&mutex_writecount);
+        lock_TAS(mutex_writecount);
 
         // section critique - writecount
         writecount = writecount - 1;
@@ -124,7 +124,7 @@ void *writer(void *args) {
             semaphore_post(&rsem);
         }
 
-        unlock_TAS(&mutex_writecount);
+        unlock_TAS(mutex_writecount);
     }
 
     return NULL;
@@ -169,15 +169,20 @@ int main(int argc, char *argv[]) {
     pthread_t thread_write[nb_writer_threads];
 
     // Initialisation des mutex
-    err = init_TAS(&mutex_readcount);
+    mutex_readcount = malloc(sizeof(LockTAS));
+    err = init_TAS(mutex_readcount);
     if (err != 0) print_error(err, "mutex_init readcount");
-    err = init_TAS(&mutex_writecount);
+    mutex_writecount = malloc(sizeof(LockTAS));
+    err = init_TAS(mutex_writecount);
     if (err != 0) print_error(err, "mutex_init writecount");
-    err = init_TAS(&mutex_readdb);
+    mutex_readdb = malloc(sizeof(LockTAS));
+    err = init_TAS(mutex_readdb);
     if (err != 0) print_error(err, "mutex_init readdb");
-    err = init_TAS(&mutex_writedb);
+    mutex_writedb = malloc(sizeof(LockTAS));
+    err = init_TAS(mutex_writedb);
     if (err != 0) print_error(err, "mutex_init writedb");
-    err = init_TAS(&z);
+    z = malloc(sizeof(LockTAS));
+    err = init_TAS(z);
     if (err != 0) print_error(err, "mutex_init z");
 
     // Initialisation des semaphores read / write
@@ -206,11 +211,11 @@ int main(int argc, char *argv[]) {
     }
 
     // Destruction des mutex
-    destroy_TAS(&mutex_readcount);
-    destroy_TAS(&mutex_writecount);
-    destroy_TAS(&mutex_readdb);
-    destroy_TAS(&mutex_writedb);
-    destroy_TAS(&z);
+    free(mutex_readcount);
+    free(mutex_writecount);
+    free(mutex_readdb);
+    free(mutex_writedb);
+    free(z);
 
     // Destruction des semaphores
     err = semaphore_destroy(&wsem);

@@ -110,7 +110,6 @@ int main(int argc, char *argv[]) {
 
     // Destruction des mutex
     for (int i = 0; i < nb_baguette; i++) {
-        destroy_TAS(&baguettes[i]);
         if (err != 0) print_error(err, "pthread_mutex_destroy");
     }
 

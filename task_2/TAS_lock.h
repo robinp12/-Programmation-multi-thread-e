@@ -8,8 +8,6 @@ typedef struct {
 } LockTAS;
 
 int init_TAS(LockTAS *lock) {
-    lock = malloc(sizeof(LockTAS));
-
     if (lock == NULL) {
         return -1;
     }
@@ -17,8 +15,6 @@ int init_TAS(LockTAS *lock) {
     lock->state = 0;
     return 0;
 }
-
-void destroy_TAS(LockTAS *lock) { free(lock); }
 
 void lock_TAS(LockTAS *lock) {
     asm("enter:\n"

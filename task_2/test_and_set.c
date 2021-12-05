@@ -11,7 +11,6 @@
 typedef struct {
     pthread_t thread;
     int remaining_actions;
-    int thread_id;
 } ThreadInfo;
 
 void work();
@@ -41,6 +40,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    lock = malloc(sizeof(LockTAS));
     if (init_TAS(lock) != 0) {
         printf("Error, no memory available.");
         exit(EXIT_FAILURE);
@@ -49,16 +49,16 @@ int main(int argc, char *argv[]) {
     threads = malloc(sizeof(ThreadInfo) * nb_threads);
 
     for (int i = 0; i < nb_threads; i++) {
-        pthread_create(&(threads[i].thread), NULL, execute_action,
-                       &(threads[i].thread_id));
+        pthread_create(&(threads[i].thread), NULL, execute_action, &i);
+
         threads[i].remaining_actions = NB_ACTIONS / nb_threads;
-        threads[i].thread_id = i;
     }
 
     for (int i = 0; i < nb_threads; i++) {
         pthread_join(threads[i].thread, NULL);
     }
 
+    free(lock);
     free(threads);
     exit(EXIT_SUCCESS);
 }

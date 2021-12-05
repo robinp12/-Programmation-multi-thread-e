@@ -19,7 +19,7 @@ void consume();
 void producer();
 void consumer();
 
-LockTAS mutex;
+LockTAS *mutex;
 Semaphore empty;
 Semaphore full;
 int buffer[BUFFER_SIZE];
@@ -73,7 +73,8 @@ int main(int argc, char *argv[]) {
     pthread_t consumers[nb_consumers];
 
     // Initialisation du mutex
-    err = init_TAS(&mutex);
+    mutex = malloc(sizeof(LockTAS));
+    err = init_TAS(mutex);
     if (err != 0) print_error(err, "mutex_init");
 
     // Initialisation des semaphores
@@ -105,7 +106,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Destruction des mutex
-    destroy_TAS(&mutex);
+    free(mutex);
 
     // Destruction des semaphores
     err = semaphore_destroy(&empty);
@@ -138,16 +139,16 @@ void consume() {
 void producer() {
     while (nb_produced_elements < MAX_NB_ELEMENTS) {
         semaphore_wait(&empty);
-        lock_TAS(&mutex);
+        lock_TAS(mutex);
 
         if (nb_produced_elements == MAX_NB_ELEMENTS) {
-            unlock_TAS(&mutex);
+            unlock_TAS(mutex);
             semaphore_post(&full);
             return;
         }
 
         produce();
-        unlock_TAS(&mutex);
+        unlock_TAS(mutex);
         semaphore_post(&full);
     }
 }
@@ -155,16 +156,16 @@ void producer() {
 void consumer() {
     while (nb_consumed_elements < MAX_NB_ELEMENTS) {
         semaphore_wait(&full);
-        lock_TAS(&mutex);
+        lock_TAS(mutex);
 
         if (nb_consumed_elements == MAX_NB_ELEMENTS) {
-            unlock_TAS(&mutex);
+            unlock_TAS(mutex);
             semaphore_post(&empty);
             return;
         }
 
         consume();
-        unlock_TAS(&mutex);
+        unlock_TAS(mutex);
         semaphore_post(&empty);
     }
 }
