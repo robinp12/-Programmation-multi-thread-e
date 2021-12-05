@@ -54,7 +54,7 @@ plt.grid(True)
 plt.legend(['Test & Set', 'Test & Test & Set'], loc = 'upper right')
 
 # on enregistre le graphique. L'extension est directement déduite du nom donné en argument (png par défault).
-plt.savefig(f'{file1.replace("out/task_2/", "")}.png')
+plt.savefig(f'{file1.replace("out", "graphs")}.png')
 
 # On ferme proprement le plot.
 plt.close()
