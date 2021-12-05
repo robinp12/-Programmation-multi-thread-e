@@ -65,7 +65,8 @@ for file in files:
     plt.legend(['implémentation POSIX', 'notre implémentation'], loc = 'upper right')
 
     # on enregistre le graphique. L'extension est directement déduite du nom donné en argument (png par défault).
-    plt.savefig(f'{file.replace("out/task_2/", "")}.png')
+    plt.savefig(f'{file.replace("out", "graphs")}.png')
+    plt.savefig(f'{file.replace("out", "graphs")}.pdf')
 
 # On ferme proprement le plot.
 plt.close()

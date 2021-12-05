@@ -1,4 +1,4 @@
-all: task1 task2
+all: clean task1 task2
 
 task1: compile1 perf1 graphs1
 
@@ -24,7 +24,7 @@ perf1:
 graphs1:
 		python3 task_1/plot.py
 clean1:
-		rm out/task_1/** && touch out/task_1/empty
+		rm out/task_1/** && touch out/task_1/empty && rm graphs/task_1/** && touch graphs/task_1/empty
 
 
 philosophers2:
@@ -42,4 +42,4 @@ perf2:
 graphs2:
 		python3 task_2/plot.py && python3 task_2/plot_locks.py 
 clean2:
-		rm out/task_2/** && touch out/task_2/empty
+		rm out/task_2/** && touch out/task_2/empty && rm graphs/task_2/** && touch graphs/task_2/empty

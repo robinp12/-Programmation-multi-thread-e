@@ -34,8 +34,15 @@ The project requires having a version of Python 3 installed, along with the Matp
 
 `make clean`
 
-![Alt text](/philosophers.o.csv.png?raw=true "Philosophes")
-![Alt text](/producerConsumer.o.csv.png?raw=true "Producteurs/Consommateurs")
-![Alt text](/readerWriter.o.csv.png?raw=true "Lecteurs/Ecrivains")
-![Alt text](/test_and_set.o.csv.png?raw=true "Test & Set")
+## Philosophes
+![Philosophes](graphs/task_2/philosophers.o.csv.png?raw=true "Philosophes")
+
+## Producteurs/Consommateurs
+![Producteurs/Consommateurs](graphs/task_2/producerConsumer.o.csv.png?raw=true "Producteurs/Consommateurs")
+
+## Lecteurs/Ecrivains
+![Lecteurs/Ecrivains](graphs/task_2/readerWriter.o.csv.png?raw=true "Lecteurs/Ecrivains")
+
+## Test & Set
+![Test & Set](graphs/task_2/test_and_set.o.csv.png?raw=true "Test & Set")
 

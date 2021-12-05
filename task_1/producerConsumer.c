@@ -144,7 +144,6 @@ void producer() {
         if (nb_produced_elements == MAX_NB_ELEMENTS) {
             pthread_mutex_unlock(&mutex);
             sem_post(&full);
-            return;
         }
 
         produce();
@@ -161,7 +160,6 @@ void consumer() {
         if (nb_consumed_elements == MAX_NB_ELEMENTS) {
             pthread_mutex_unlock(&mutex);
             sem_post(&empty);
-            return;
         }
 
         consume();
