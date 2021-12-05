@@ -20,8 +20,8 @@ void producer();
 void consumer();
 
 LockTAS *mutex;
-Semaphore empty;
-Semaphore full;
+Semaphore *empty;
+Semaphore *full;
 int buffer[BUFFER_SIZE];
 
 int nb_produced_elements = 0;
@@ -78,9 +78,12 @@ int main(int argc, char *argv[]) {
     if (err != 0) print_error(err, "mutex_init");
 
     // Initialisation des semaphores
-    err = semaphore_init(&empty, BUFFER_SIZE);
+    empty = malloc(sizeof(Semaphore));
+    err = semaphore_init(empty, BUFFER_SIZE);
     if (err != 0) print_error(err, "sem_init empty");
-    err = semaphore_init(&full, 0);
+
+    full = malloc(sizeof(Semaphore));
+    err = semaphore_init(full, 0);
     if (err != 0) print_error(err, "sem_init full");
 
     // Creation des threads producteur
@@ -109,9 +112,12 @@ int main(int argc, char *argv[]) {
     free(mutex);
 
     // Destruction des semaphores
-    err = semaphore_destroy(&empty);
+    err = semaphore_destroy(empty);
+    free(empty);
     if (err != 0) print_error(err, "sem_destroy empty");
-    err = semaphore_destroy(&full);
+
+    err = semaphore_destroy(full);
+    free(full);
     if (err != 0) print_error(err, "sem_destroy full");
 
     exit(EXIT_SUCCESS);
@@ -138,32 +144,34 @@ void consume() {
 
 void producer() {
     while (nb_produced_elements < MAX_NB_ELEMENTS) {
-        semaphore_wait(&empty);
+        semaphore_wait(empty);
         lock_TAS(mutex);
 
         if (nb_produced_elements == MAX_NB_ELEMENTS) {
             unlock_TAS(mutex);
-            semaphore_post(&full);
+            semaphore_post(full);
+            return;
         }
 
         produce();
         unlock_TAS(mutex);
-        semaphore_post(&full);
+        semaphore_post(full);
     }
 }
 
 void consumer() {
     while (nb_consumed_elements < MAX_NB_ELEMENTS) {
-        semaphore_wait(&full);
+        semaphore_wait(full);
         lock_TAS(mutex);
 
         if (nb_consumed_elements == MAX_NB_ELEMENTS) {
             unlock_TAS(mutex);
-            semaphore_post(&empty);
+            semaphore_post(empty);
+            return;
         }
 
         consume();
         unlock_TAS(mutex);
-        semaphore_post(&empty);
+        semaphore_post(empty);
     }
 }
