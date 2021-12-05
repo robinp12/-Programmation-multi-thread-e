@@ -1,8 +1,6 @@
 #ifndef _SEMAPHORE_H
 #define _SEMAPHORE_H
 
-#include <stdbool.h>
-
 #include "TAS_lock.h"
 
 typedef struct {
@@ -11,20 +9,12 @@ typedef struct {
 } Semaphore;
 
 int semaphore_init(Semaphore *sem, int initial_state) {
-    sem = malloc(sizeof(Semaphore));
     if (sem == NULL) {
         return -1;
     }
 
     sem->state = initial_state;
     init_TAS(sem->lock);
-    return 0;
-}
-
-int semaphore_destroy(Semaphore *sem) {
-    free(sem->lock);
-    free(sem);
-    sem = NULL;
     return 0;
 }
 
@@ -43,6 +33,11 @@ int semaphore_post(Semaphore *sem) {
         // Remove one thread T from s.queue;
         // Mark thread T as ready to run;
     }
+    return 0;
+}
+
+int semaphore_destroy(Semaphore *sem) {
+    free(sem->lock);
     return 0;
 }
 

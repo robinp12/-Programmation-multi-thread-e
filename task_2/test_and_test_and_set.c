@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "TAS_lock.h"
+#include "TATAS_lock.h"
 
 #define NB_ACTIONS 6400
 
@@ -17,7 +17,7 @@ void work();
 void *execute_action(void *i);
 void test_TAS_lock(ThreadInfo *thread);
 
-LockTAS *lock;
+LockTATAS *lock;
 ThreadInfo *threads;
 
 int main(int argc, char *argv[]) {
@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    lock = malloc(sizeof(LockTAS));
-    if (init_TAS(lock) != 0) {
+    lock = malloc(sizeof(LockTATAS));
+    if (init_TATAS(lock) != 0) {
         printf("Error, no memory available.");
         exit(EXIT_FAILURE);
     }
@@ -79,15 +79,15 @@ void *execute_action(void *id) {
 
 void test_TAS_lock(ThreadInfo *thread) {
     while (true) {
-        lock_TAS(lock);
+        lock_TATAS(lock);
 
         if (thread->remaining_actions == 0) {
-            unlock_TAS(lock);
+            unlock_TATAS(lock);
             break;
         }
 
         work();
         thread->remaining_actions--;
-        unlock_TAS(lock);
+        unlock_TATAS(lock);
     }
 }
