@@ -15,7 +15,7 @@ typedef struct {
 
 void work();
 void *execute_action(void *i);
-void test_TAS_lock(ThreadInfo *thread);
+void test_TATAS_lock(ThreadInfo *thread);
 
 LockTATAS *lock;
 ThreadInfo *threads;
@@ -72,12 +72,12 @@ void *execute_action(void *id) {
     int id_int = *((int *)id);
     ThreadInfo current_thread = threads[id_int];
 
-    test_TAS_lock(&current_thread);
+    test_TATAS_lock(&current_thread);
 
     return NULL;
 }
 
-void test_TAS_lock(ThreadInfo *thread) {
+void test_TATAS_lock(ThreadInfo *thread) {
     while (true) {
         lock_TATAS(lock);
 
