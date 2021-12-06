@@ -8,10 +8,6 @@ typedef struct {
 } LockTAS;
 
 int init_TAS(LockTAS *lock) {
-    if (lock == NULL) {
-        return -1;
-    }
-
     lock->state = 0;
     return 0;
 }

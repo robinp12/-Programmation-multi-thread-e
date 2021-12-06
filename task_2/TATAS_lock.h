@@ -8,10 +8,6 @@ typedef struct {
 } LockTATAS;
 
 int init_TATAS(LockTATAS *lock) {
-    if (lock == NULL) {
-        return -1;
-    }
-
     lock->state = 0;
     return 0;
 }
@@ -31,11 +27,7 @@ void lock_TATAS(LockTATAS *lock) {
 }
 
 void unlock_TATAS(LockTATAS *lock) {
-    asm("movl $0, %%eax\n"   // %eax = 0
-        "xchgl %%eax, %0\n"  // swap %eax and the first operand
-        : "=m"(lock->state)  // output operands
-        : "m"(lock->state)   // input operands
-        : "%eax");           // modified registers
+    lock->state = 0;
 }
 
 #endif

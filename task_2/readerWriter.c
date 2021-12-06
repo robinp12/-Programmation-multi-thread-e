@@ -206,12 +206,5 @@ int main(int argc, char *argv[]) {
         if (err != 0) print_error(err, "pthread_create writer");
     }
 
-    // Destruction des semaphores
-    err = semaphore_destroy(&wsem);
-    if (err != 0) print_error(err, "sem_destroy write");
-
-    err = semaphore_destroy(&rsem);
-    if (err != 0) print_error(err, "sem_destroy read");
-
     exit(EXIT_SUCCESS);
 }

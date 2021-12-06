@@ -14,8 +14,10 @@
 #define BUFFER_SIZE 8
 
 LockTAS mutex;
-Semaphore empty;
-Semaphore full;
+
+Semaphore *empty;
+Semaphore *full;
+
 int buffer[BUFFER_SIZE];
 
 int nb_produced_elements = 0;
@@ -36,7 +38,6 @@ void produce() {
     printf("producing\n");
     buffer[nb_produced_elements % BUFFER_SIZE] = rand();
     nb_produced_elements++;
-    work();
 }
 
 void consume() {
@@ -48,35 +49,23 @@ void consume() {
 
 void *producer() {
     while (nb_produced_elements < MAX_NB_ELEMENTS) {
-        semaphore_wait(&empty);
+        work();
+        semaphore_wait(empty);
         lock_TAS(&mutex);
-
-        if (nb_produced_elements == MAX_NB_ELEMENTS) {
-            unlock_TAS(&mutex);
-            semaphore_post(&empty);
-            break;
-        }
-
-        produce();
+            if (nb_produced_elements == MAX_NB_ELEMENTS) produce();
         unlock_TAS(&mutex);
-        semaphore_post(&full);
+        semaphore_post(full);
     }
 }
 
 void *consumer() {
     while (nb_consumed_elements < MAX_NB_ELEMENTS) {
-        semaphore_wait(&full);
+        work();
+        semaphore_wait(full);
         lock_TAS(&mutex);
-
-        if (nb_consumed_elements == MAX_NB_ELEMENTS) {
-            unlock_TAS(&mutex);
-            semaphore_post(&full);
-            break;
-        }
-
-        consume();
+            if (nb_consumed_elements == MAX_NB_ELEMENTS) consume();
         unlock_TAS(&mutex);
-        semaphore_post(&empty);
+        semaphore_post(empty);
     }
 }
 
@@ -122,22 +111,24 @@ int main(int argc, char *argv[]) {
     err = init_TAS(&mutex);
     if (err != 0) print_error(err, "mutex_init");
 
+    empty=malloc(sizeof(Semaphore));
     // Initialisation des semaphores
-    err = semaphore_init(&empty, BUFFER_SIZE);
+    err = semaphore_init(empty, BUFFER_SIZE);
     if (err != 0) print_error(err, "sem_init empty");
 
-    err = semaphore_init(&full, 0);
+    full=malloc(sizeof(Semaphore));
+    err = semaphore_init(full, 0);
     if (err != 0) print_error(err, "sem_init full");
 
     // Creation des threads producteur
     for (int i = 0; i < nb_producers; i++) {
-        err = pthread_create(&producers[i], NULL, producer, NULL);
+        err = pthread_create(&producers[i], NULL, &producer, NULL);
         if (err != 0) print_error(err, "pthread_create producer");
     }
 
     // Creation des threads consomateurs
     for (int i = 0; i < nb_consumers; i++) {
-        err = pthread_create(&consumers[i], NULL, consumer, NULL);
+        err = pthread_create(&consumers[i], NULL, &consumer, NULL);
         if (err != 0) print_error(err, "pthread_create consumer");
     }
 
@@ -150,13 +141,6 @@ int main(int argc, char *argv[]) {
         err = pthread_join(consumers[i], NULL);
         if (err != 0) print_error(err, "pthread_create consumers");
     }
-
-    // Destruction des semaphores
-    err = semaphore_destroy(&empty);
-    if (err != 0) print_error(err, "sem_destroy empty");
-
-    err = semaphore_destroy(&full);
-    if (err != 0) print_error(err, "sem_destroy full");
 
     exit(EXIT_SUCCESS);
 }
