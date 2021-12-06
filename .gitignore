@@ -1,7 +1,10 @@
-*.o
-*.exe
-out/task_1/**
-out/task_2/**
+out/task_1/*.o
+out/task_1/*.csv
+out/task_2/*.o
+out/task_2/*.csv
+
+!out/task_1/final/
+!out/task_2/final/
 
 !out/task_1/empty
 !out/task_2/empty
