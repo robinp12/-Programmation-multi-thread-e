@@ -3,15 +3,19 @@
 
 #include <stdlib.h>
 
+// Structure représentant notre implémentation d'un verrou à attente active
+// utilisant l'algorithme Test and Set (TAS)
 typedef struct {
     int state;
 } LockTAS;
 
+// Fonction utilisée pour initialiser un verrou TAS
 int init_TAS(LockTAS *lock) {
     lock->state = 0;
     return 0;
 }
 
+// Fonction qui protège l'accès à la section critique d'un thread
 void lock_TAS(LockTAS *lock) {
     asm("enter:\n"
         "movl $1, %%eax\n"      // %eax = 1
@@ -23,12 +27,9 @@ void lock_TAS(LockTAS *lock) {
         : "%eax");              // modified registers
 }
 
+// Fonction qui libère l'accès à la section critique d'un thread
 void unlock_TAS(LockTAS *lock) {
-    asm("movl $0, %%eax\n"   // %eax = 0
-        "xchgl %%eax, %0\n"  // swap %eax and the first operand
-        : "=m"(lock->state)  // output operands
-        : "m"(lock->state)   // input operands
-        : "%eax");           // modified registers
+    lock->state = 0;
 }
 
 #endif

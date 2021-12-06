@@ -8,6 +8,8 @@
 
 #define NB_ACTIONS 6400
 
+// Structure représentant un thread et tenant à jour le nombre d'actions qu'il
+// lui reste à effectuer
 typedef struct {
     pthread_t thread;
     int remaining_actions;
@@ -23,6 +25,7 @@ ThreadInfo *threads;
 int main(int argc, char *argv[]) {
     int nb_threads;
 
+    // vérification des arguments du programme
     if (argc != 2) {
         printf("Error, expected one argument, but received %d.", (argc - 1));
         exit(EXIT_FAILURE);
@@ -40,12 +43,14 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    // initialisation du verrou TATAS
     lock = malloc(sizeof(LockTATAS));
     if (init_TATAS(lock) != 0) {
         printf("Error, no memory available.");
         exit(EXIT_FAILURE);
     }
 
+    // initialisation et lancement des threads
     threads = malloc(sizeof(ThreadInfo) * nb_threads);
 
     for (int i = 0; i < nb_threads; i++) {
@@ -58,16 +63,19 @@ int main(int argc, char *argv[]) {
         pthread_join(threads[i].thread, NULL);
     }
 
+    // libération de la mémoire allouée pour le verrou et les threads
     free(lock);
     free(threads);
     exit(EXIT_SUCCESS);
 }
 
+// Fonction qui simule la section critique d'un thread
 void work() {
     while (rand() > RAND_MAX / 10000) {
     }
 }
 
+// Fonction qui sera exécutée par les threads
 void *execute_action(void *id) {
     int id_int = *((int *)id);
     ThreadInfo current_thread = threads[id_int];
@@ -81,6 +89,7 @@ void test_TATAS_lock(ThreadInfo *thread) {
     while (true) {
         lock_TATAS(lock);
 
+        // le thread a effectué son nombre maximal d'actions
         if (thread->remaining_actions == 0) {
             unlock_TATAS(lock);
             break;

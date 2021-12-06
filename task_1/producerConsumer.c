@@ -28,39 +28,45 @@ void print_error(int err, char *msg) {
     exit(EXIT_FAILURE);
 }
 
+// Fonction qui simule le travail effectué pour produire/consommer un élément
 void work() {
     while (rand() > RAND_MAX / 10000) {}
 }
 
+// Fonction appelée par le producteur pour produire un nouvel élément
 void produce() {
     printf("producing\n");
     buffer[nb_produced_elements % BUFFER_SIZE] = rand();
     nb_produced_elements++;
 }
 
+// Fonction appelée par le consommateur pour consommer un élément
 void consume() {
     printf("consuming\n");
     buffer[nb_consumed_elements % BUFFER_SIZE] = 0;
     nb_consumed_elements++;
 }
 
+// Fonction qui sera exécutée par les threads producteurs
 void *producer() {
     while (nb_produced_elements < MAX_NB_ELEMENTS) {
         work();
         sem_wait(&empty);
         pthread_mutex_lock(&mutex);
+            // les producteurs ont produit le nombre maximal d'éléments
             if(nb_produced_elements < MAX_NB_ELEMENTS) produce();
         pthread_mutex_unlock(&mutex);
         sem_post(&full);
     }
 }
 
+// Fonction qui sera exécutée par les threads consommateurs
 void *consumer() {
     while (nb_consumed_elements < MAX_NB_ELEMENTS) {
         work();
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
-
+             // les consommateurs ont consommé le nombre maximal d'éléments
             if (nb_consumed_elements < MAX_NB_ELEMENTS) consume();
         pthread_mutex_unlock(&mutex);
         sem_post(&empty);

@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Appel systeme pour le nombre de coeurs
+# Le premier argument du script correspond au nom du fichier à exécuter
 file=$1
+# Appel systeme pour le nombre de coeurs
 max_threads=$(nproc)
 
 # Initialiser un nouveau fichier csv

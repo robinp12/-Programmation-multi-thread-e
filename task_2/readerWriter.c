@@ -1,13 +1,11 @@
 #include <ctype.h>
 #include <errno.h>
 #include <pthread.h>
+#include "semaphore.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "TAS_lock.h"
-#include "semaphore.h"
 
 Semaphore db;
 int readcount = 0;
@@ -31,22 +29,29 @@ void print_error(int err, char *msg) {
     exit(EXIT_FAILURE);
 }
 
-void write_database() { printf("write database\n"); }
+void write_database() {
+    printf("write database\n");
+}
 
-void read_database() { printf("read database\n"); }
+void read_database() {
+    printf("read database\n");
+}
 
+// Fonction appelée par les lecteurs, qui simule une lecture de données
 void process_data() {
     while (rand() > RAND_MAX / 10000) {
         // processing data
     }
 }
 
+// Fonction appelée par les écrivains, qui simule une création de données
 void prepare_data() {
     while (rand() > RAND_MAX / 10000) {
         // preparing data
     }
 }
 
+// Fonction appelée par les threads lecteurs
 void *reader(void *args) {
     while (true) {
         lock_TAS(&z);
@@ -90,6 +95,7 @@ void *reader(void *args) {
     return NULL;
 }
 
+// Fonction appelée par les threads écrivains
 void *writer(void *args) {
     while (true) {
         prepare_data();
@@ -181,13 +187,12 @@ int main(int argc, char *argv[]) {
     if (err != 0) print_error(err, "mutex_init z");
 
     // Initialisation des semaphores read / write
-    err = semaphore_init(&wsem, 0);
+    err = semaphore_init(&wsem,1);
     if (err != 0) print_error(err, "sem_init write");
-
-    err = semaphore_init(&rsem, 0);
+    err = semaphore_init(&rsem,1);
     if (err != 0) print_error(err, "sem_init read");
 
-     // Creation des thread reader / writer
+    // Creation des thread reader / writer
     for (int i = 0; i < nb_reader_threads; i++) {
         err = pthread_create(&thread_read[i], NULL, reader, NULL);
         if (err != 0) print_error(err, "pthread_create reader");

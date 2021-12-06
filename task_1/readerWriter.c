@@ -37,18 +37,21 @@ void read_database() {
     printf("read database\n");
 }
 
+// Fonction appelée par les lecteurs, qui simule une lecture de données
 void process_data() {
     while (rand() > RAND_MAX / 10000) {
         // processing data
     }
 }
 
+// Fonction appelée par les écrivains, qui simule une création de données
 void prepare_data() {
     while (rand() > RAND_MAX / 10000) {
         // preparing data
     }
 }
 
+// Fonction appelée par les threads lecteurs
 void *reader(void *args) {
     while (true) {
         pthread_mutex_lock(&z);
@@ -92,6 +95,7 @@ void *reader(void *args) {
     return NULL;
 }
 
+// Fonction appelée par les threads écrivains
 void *writer(void *args) {
     while (true) {
         prepare_data();

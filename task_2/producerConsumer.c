@@ -1,22 +1,21 @@
 #include <ctype.h>
 #include <errno.h>
 #include <pthread.h>
+#include "semaphore.h"
+#include <semaphore.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "TAS_lock.h"
-#include "semaphore.h"
-
 #define MAX_NB_ELEMENTS 1024
 #define BUFFER_SIZE 8
 
 LockTAS mutex;
 
-Semaphore *empty;
-Semaphore *full;
+Semaphore empty;
+Semaphore full;
 
 int buffer[BUFFER_SIZE];
 
@@ -30,44 +29,52 @@ void print_error(int err, char *msg) {
     exit(EXIT_FAILURE);
 }
 
+// Fonction qui simule le travail effectué pour produire/consommer un élément
 void work() {
-    while (rand() > RAND_MAX / 10000) {    }
+    while (rand() > RAND_MAX / 10000) {}
 }
 
+// Fonction appelée par le producteur pour produire un nouvel élément
 void produce() {
     printf("producing\n");
     buffer[nb_produced_elements % BUFFER_SIZE] = rand();
     nb_produced_elements++;
 }
 
+// Fonction appelée par le consommateur pour consommer un élément
 void consume() {
     printf("consuming\n");
     buffer[nb_consumed_elements % BUFFER_SIZE] = 0;
     nb_consumed_elements++;
-    work();
 }
 
+// Fonction qui sera exécutée par les threads producteurs
 void *producer() {
     while (nb_produced_elements < MAX_NB_ELEMENTS) {
         work();
-        semaphore_wait(empty);
+        semaphore_wait(&empty);
         lock_TAS(&mutex);
-            if (nb_produced_elements == MAX_NB_ELEMENTS) produce();
+            // les producteurs ont produit le nombre maximal d'éléments
+            if(nb_produced_elements < MAX_NB_ELEMENTS) produce();
         unlock_TAS(&mutex);
-        semaphore_post(full);
+        semaphore_post(&full);
     }
 }
 
+// Fonction qui sera exécutée par les threads consommateurs
 void *consumer() {
     while (nb_consumed_elements < MAX_NB_ELEMENTS) {
         work();
-        semaphore_wait(full);
+        semaphore_wait(&full);
         lock_TAS(&mutex);
-            if (nb_consumed_elements == MAX_NB_ELEMENTS) consume();
+             // les consommateurs ont consommé le nombre maximal d'éléments
+            if (nb_consumed_elements < MAX_NB_ELEMENTS) consume();
         unlock_TAS(&mutex);
-        semaphore_post(empty);
+        semaphore_post(&empty);
     }
 }
+
+
 
 int main(int argc, char *argv[]) {
     int nb_producers;
@@ -111,24 +118,21 @@ int main(int argc, char *argv[]) {
     err = init_TAS(&mutex);
     if (err != 0) print_error(err, "mutex_init");
 
-    empty=malloc(sizeof(Semaphore));
     // Initialisation des semaphores
-    err = semaphore_init(empty, BUFFER_SIZE);
+    err = semaphore_init(&empty, BUFFER_SIZE);
     if (err != 0) print_error(err, "sem_init empty");
-
-    full=malloc(sizeof(Semaphore));
-    err = semaphore_init(full, 0);
+    err = semaphore_init(&full, 0);
     if (err != 0) print_error(err, "sem_init full");
 
     // Creation des threads producteur
     for (int i = 0; i < nb_producers; i++) {
-        err = pthread_create(&producers[i], NULL, &producer, NULL);
+        err = pthread_create(&producers[i], NULL, producer, NULL);
         if (err != 0) print_error(err, "pthread_create producer");
     }
 
     // Creation des threads consomateurs
     for (int i = 0; i < nb_consumers; i++) {
-        err = pthread_create(&consumers[i], NULL, &consumer, NULL);
+        err = pthread_create(&consumers[i], NULL, consumer, NULL);
         if (err != 0) print_error(err, "pthread_create consumer");
     }
 
@@ -144,5 +148,3 @@ int main(int argc, char *argv[]) {
 
     exit(EXIT_SUCCESS);
 }
-
-

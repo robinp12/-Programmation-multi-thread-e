@@ -3,15 +3,19 @@
 
 #include <stdlib.h>
 
+// Structure représentant notre implémentation d'un verrou à attente active
+// utilisant l'algorithme Test and Test and Set (TATAS)
 typedef struct {
     int state;
 } LockTATAS;
 
+// Fonction utilisée pour initialiser un verrou TATAS
 int init_TATAS(LockTATAS *lock) {
     lock->state = 0;
     return 0;
 }
 
+// Fonction qui protège l'accès à la section critique d'un thread
 void lock_TATAS(LockTATAS *lock) {
     asm("enter:\n"
         "loop:\n"
@@ -26,6 +30,7 @@ void lock_TATAS(LockTATAS *lock) {
         : "%eax");              // modified registers
 }
 
+// Fonction qui libère l'accès à la section critique d'un thread
 void unlock_TATAS(LockTATAS *lock) {
     lock->state = 0;
 }
