@@ -11,12 +11,6 @@
 #define MAX_NB_ELEMENTS 1024
 #define BUFFER_SIZE 8
 
-void work();
-void produce();
-void consume();
-void producer();
-void consumer();
-
 pthread_mutex_t mutex;
 sem_t empty;
 sem_t full;
@@ -31,6 +25,60 @@ void print_error(int err, char *msg) {
             strerror(errno));
     exit(EXIT_FAILURE);
 }
+
+void work() {
+    while (rand() > RAND_MAX / 10000) {}
+}
+
+void produce() {
+    printf("producing\n");
+    buffer[nb_produced_elements % BUFFER_SIZE] = rand();
+    nb_produced_elements++;
+    work();
+}
+
+void consume() {
+    printf("consuming\n");
+    buffer[nb_consumed_elements % BUFFER_SIZE] = 0;
+    nb_consumed_elements++;
+    work();
+}
+
+void *producer() {
+    while (nb_produced_elements < MAX_NB_ELEMENTS) {
+        sem_wait(&empty);
+        pthread_mutex_lock(&mutex);
+
+        if (nb_produced_elements == MAX_NB_ELEMENTS) {
+            pthread_mutex_unlock(&mutex);
+            sem_post(&empty);
+            break;
+        }
+
+        produce();
+        pthread_mutex_unlock(&mutex);
+        sem_post(&full);
+    }
+}
+
+void *consumer() {
+    while (nb_consumed_elements < MAX_NB_ELEMENTS) {
+        sem_wait(&full);
+        pthread_mutex_lock(&mutex);
+
+        if (nb_consumed_elements == MAX_NB_ELEMENTS) {
+            pthread_mutex_unlock(&mutex);
+            sem_post(&full);
+            break;
+        }
+
+        consume();
+        pthread_mutex_unlock(&mutex);
+        sem_post(&empty);
+    }
+}
+
+
 
 int main(int argc, char *argv[]) {
     int nb_producers;
@@ -82,13 +130,13 @@ int main(int argc, char *argv[]) {
 
     // Creation des threads producteur
     for (int i = 0; i < nb_producers; i++) {
-        err = pthread_create(&producers[i], NULL, (void *)producer, (void *)&i);
+        err = pthread_create(&producers[i], NULL, producer, NULL);
         if (err != 0) print_error(err, "pthread_create producer");
     }
 
     // Creation des threads consomateurs
     for (int i = 0; i < nb_consumers; i++) {
-        err = pthread_create(&consumers[i], NULL, (void *)consumer, (void *)&i);
+        err = pthread_create(&consumers[i], NULL, consumer, NULL);
         if (err != 0) print_error(err, "pthread_create consumer");
     }
 
@@ -115,57 +163,4 @@ int main(int argc, char *argv[]) {
     if (err != 0) print_error(err, "sem_destroy full");
 
     exit(EXIT_SUCCESS);
-}
-
-void work() {
-    while (rand() > RAND_MAX / 10000) {
-        // doing some very important work
-    }
-}
-
-void produce() {
-    printf("producing\n");
-    buffer[nb_produced_elements % BUFFER_SIZE] = rand();
-    nb_produced_elements++;
-}
-
-void consume() {
-    printf("consuming\n");
-    buffer[nb_consumed_elements % BUFFER_SIZE] = 0;
-    nb_consumed_elements++;
-    work();
-}
-
-void producer() {
-    while (nb_produced_elements < MAX_NB_ELEMENTS) {
-        sem_wait(&empty);
-        pthread_mutex_lock(&mutex);
-
-        if (nb_produced_elements == MAX_NB_ELEMENTS) {
-            pthread_mutex_unlock(&mutex);
-            sem_post(&full);
-            break;
-        }
-
-        produce();
-        pthread_mutex_unlock(&mutex);
-        sem_post(&full);
-    }
-}
-
-void consumer() {
-    while (nb_consumed_elements < MAX_NB_ELEMENTS) {
-        sem_wait(&full);
-        pthread_mutex_lock(&mutex);
-
-        if (nb_consumed_elements == MAX_NB_ELEMENTS) {
-            pthread_mutex_unlock(&mutex);
-            sem_post(&empty);
-            break;
-        }
-
-        consume();
-        pthread_mutex_unlock(&mutex);
-        sem_post(&empty);
-    }
 }
