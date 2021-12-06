@@ -21,11 +21,11 @@ producerConsumer1:
 readerWriter1:
 		gcc -I -Wall -Werror -std=c99 task_1/readerWriter.c -o out/task_1/readerWriter.o -pthread
 perf1:
-		./task_1/time_perf.sh out/task_1/philosophers.o && ./task_1/time_perf.sh out/task_1/readerWriter.o && ./task_1/time_perf.sh out/task_1/producerConsumer.o &&
+		bash task_1/time_perf.sh out/task_1/philosophers.o && bash task_1/time_perf.sh out/task_1/readerWriter.o && bash task_1/time_perf.sh out/task_1/producerConsumer.o
 graphs1:
 		python3 task_1/plot.py
 clean1:
-		rm out/task_1/** && touch out/task_1/empty && rm graphs/task_1/** && touch graphs/task_1/empty
+		rm -r out/task_1/** && echo -n "" > out/task_1/empty && rm graphs/task_1/** && echo -n "" > graphs/task_1/empty
 
 
 philosophers2:
@@ -43,4 +43,4 @@ perf2:
 graphs2:
 		python3 task_2/plot.py && python3 task_2/plot_locks.py 
 clean2:
-		rm out/task_2/** && touch out/task_2/empty && rm graphs/task_2/** && touch graphs/task_2/empty
+		rm -r out/task_2/** && echo -n "" > out/task_2/empty && rm graphs/task_2/** && echo -n "" > graphs/task_2/empty

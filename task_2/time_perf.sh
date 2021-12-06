@@ -2,7 +2,7 @@
 
 # Appel systeme pour le nombre de coeurs
 file=$1
-max_threads=$((2 * $(nproc)))
+max_threads=$(nproc)
 
 # Initialiser un nouveau fichier csv
 output="${file}.csv"
@@ -29,9 +29,9 @@ do
 		# Mesure du temps d'execution pour les differents fichiers
 		if [ "$file" == "out/task_2/philosophers.o" ] || [ "$file" == "out/task_2/test_and_set.o" ]  || [ "$file" == "out/task/test_and_test_and_set.o" ]
 		then
-			time=$(/usr/bin/time -f %e ./$file $nb_thread 2>&1|tail -n 1)
+			time=$(/usr/bin/time -f %e ./$file $nb_thread*2 2>&1|tail -n 1)
 		else
-			time=$(/usr/bin/time -f %e ./$file $nb_thread $nb_thread 2>&1|tail -n 1)
+			time=$(/usr/bin/time -f %e ./$file $nb_thread*2 $nb_thread*2 2>&1|tail -n 1)
 		fi
 				
 		# Ecrire le resultat dans le fichier
