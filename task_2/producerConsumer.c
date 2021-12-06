@@ -13,9 +13,9 @@
 #define MAX_NB_ELEMENTS 1024
 #define BUFFER_SIZE 8
 
-LockTAS *mutex;
-Semaphore *empty;
-Semaphore *full;
+LockTAS mutex;
+Semaphore empty;
+Semaphore full;
 int buffer[BUFFER_SIZE];
 
 int nb_produced_elements = 0;
@@ -48,35 +48,35 @@ void consume() {
 
 void *producer() {
     while (nb_produced_elements < MAX_NB_ELEMENTS) {
-        semaphore_wait(empty);
-        lock_TAS(mutex);
+        semaphore_wait(&empty);
+        lock_TAS(&mutex);
 
         if (nb_produced_elements == MAX_NB_ELEMENTS) {
-            unlock_TAS(mutex);
-            semaphore_post(empty);
+            unlock_TAS(&mutex);
+            semaphore_post(&empty);
             break;
         }
 
         produce();
-        unlock_TAS(mutex);
-        semaphore_post(full);
+        unlock_TAS(&mutex);
+        semaphore_post(&full);
     }
 }
 
 void *consumer() {
     while (nb_consumed_elements < MAX_NB_ELEMENTS) {
-        semaphore_wait(full);
-        lock_TAS(mutex);
+        semaphore_wait(&full);
+        lock_TAS(&mutex);
 
         if (nb_consumed_elements == MAX_NB_ELEMENTS) {
-            unlock_TAS(mutex);
-            semaphore_post(full);
+            unlock_TAS(&mutex);
+            semaphore_post(&full);
             break;
         }
 
         consume();
-        unlock_TAS(mutex);
-        semaphore_post(empty);
+        unlock_TAS(&mutex);
+        semaphore_post(&empty);
     }
 }
 
@@ -119,17 +119,14 @@ int main(int argc, char *argv[]) {
     pthread_t consumers[nb_consumers];
 
     // Initialisation du mutex
-    mutex = malloc(sizeof(LockTAS));
-    err = init_TAS(mutex);
+    err = init_TAS(&mutex);
     if (err != 0) print_error(err, "mutex_init");
 
     // Initialisation des semaphores
-    empty = malloc(sizeof(Semaphore));
-    err = semaphore_init(empty, BUFFER_SIZE);
+    err = semaphore_init(&empty, BUFFER_SIZE);
     if (err != 0) print_error(err, "sem_init empty");
 
-    full = malloc(sizeof(Semaphore));
-    err = semaphore_init(full, 0);
+    err = semaphore_init(&full, 0);
     if (err != 0) print_error(err, "sem_init full");
 
     // Creation des threads producteur
@@ -154,16 +151,11 @@ int main(int argc, char *argv[]) {
         if (err != 0) print_error(err, "pthread_create consumers");
     }
 
-    // Destruction des mutex
-    free(mutex);
-
     // Destruction des semaphores
-    err = semaphore_destroy(empty);
-    free(empty);
+    err = semaphore_destroy(&empty);
     if (err != 0) print_error(err, "sem_destroy empty");
 
-    err = semaphore_destroy(full);
-    free(full);
+    err = semaphore_destroy(&full);
     if (err != 0) print_error(err, "sem_destroy full");
 
     exit(EXIT_SUCCESS);

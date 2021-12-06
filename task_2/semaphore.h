@@ -20,13 +20,10 @@ int semaphore_init(Semaphore *sem, int initial_state) {
 }
 
 int semaphore_wait(Semaphore *sem) {
-    lock_TAS(sem->lock);
-    --sem->state;
-    unlock_TAS(sem->lock);
-
-    if (sem->state < 0) {
-        // Place this thread in s.queue;
-        // This thread is blocked;
+    while (sem->state == 0){ 
+        lock_TAS(sem->lock);
+        --sem->state;
+        unlock_TAS(sem->lock);
     }
     return 0;
 }
