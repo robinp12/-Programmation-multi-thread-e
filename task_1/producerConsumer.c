@@ -12,8 +12,10 @@
 #define BUFFER_SIZE 8
 
 pthread_mutex_t mutex;
+
 sem_t empty;
 sem_t full;
+
 int buffer[BUFFER_SIZE];
 
 int nb_produced_elements = 0;
@@ -34,28 +36,20 @@ void produce() {
     printf("producing\n");
     buffer[nb_produced_elements % BUFFER_SIZE] = rand();
     nb_produced_elements++;
-    work();
 }
 
 void consume() {
     printf("consuming\n");
     buffer[nb_consumed_elements % BUFFER_SIZE] = 0;
     nb_consumed_elements++;
-    work();
 }
 
 void *producer() {
     while (nb_produced_elements < MAX_NB_ELEMENTS) {
+        work();
         sem_wait(&empty);
         pthread_mutex_lock(&mutex);
-
-        if (nb_produced_elements == MAX_NB_ELEMENTS) {
-            pthread_mutex_unlock(&mutex);
-            sem_post(&empty);
-            break;
-        }
-
-        produce();
+            if(nb_produced_elements < MAX_NB_ELEMENTS) produce();
         pthread_mutex_unlock(&mutex);
         sem_post(&full);
     }
@@ -63,16 +57,11 @@ void *producer() {
 
 void *consumer() {
     while (nb_consumed_elements < MAX_NB_ELEMENTS) {
+        work();
         sem_wait(&full);
         pthread_mutex_lock(&mutex);
 
-        if (nb_consumed_elements == MAX_NB_ELEMENTS) {
-            pthread_mutex_unlock(&mutex);
-            sem_post(&full);
-            break;
-        }
-
-        consume();
+            if (nb_consumed_elements < MAX_NB_ELEMENTS) consume();
         pthread_mutex_unlock(&mutex);
         sem_post(&empty);
     }
