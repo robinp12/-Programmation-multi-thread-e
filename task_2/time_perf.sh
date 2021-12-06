@@ -27,7 +27,7 @@ do
 	for ((nb_thread=1;nb_thread<=max_threads;++nb_thread))
 	do
 		# Mesure du temps d'execution pour les differents fichiers
-		if [ "$file" == "out/task_2/philosophers.o" ] || [ "$file" == "out/task_2/test_and_set.o" ]  || [ "$file" == "out/task/test_and_test_and_set.o" ]
+		if [ "$file" == "out/task_2/philosophers.o" ] || [ "$file" == "out/task_2/test_and_set.o" ]  || [ "$file" == "out/task_2/test_and_test_and_set.o" ]
 		then
 			time=$(/usr/bin/time -f %e ./$file $nb_thread*2 2>&1|tail -n 1)
 		else
