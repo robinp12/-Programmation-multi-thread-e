@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 # Le premier argument du script correspond au nom du fichier à exécuter
 file=$1
 # Appel systeme pour le nombre de coeurs
