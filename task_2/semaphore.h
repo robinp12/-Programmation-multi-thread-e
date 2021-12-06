@@ -9,6 +9,7 @@ typedef struct {
 } Semaphore;
 
 int semaphore_init(Semaphore *sem, int initial_state) {
+    sem = malloc(sizeof(Semaphore));
     if (sem == NULL) {
         return -1;
     }
@@ -19,7 +20,10 @@ int semaphore_init(Semaphore *sem, int initial_state) {
 }
 
 int semaphore_wait(Semaphore *sem) {
-    sem->state++;
+    lock_TAS(sem->lock);
+    --sem->state;
+    unlock_TAS(sem->lock);
+
     if (sem->state < 0) {
         // Place this thread in s.queue;
         // This thread is blocked;
@@ -28,7 +32,10 @@ int semaphore_wait(Semaphore *sem) {
 }
 
 int semaphore_post(Semaphore *sem) {
-    sem->state++;
+    lock_TAS(sem->lock);
+    ++sem->state;
+    unlock_TAS(sem->lock);
+
     if (sem->state > 0) {
         // Remove one thread T from s.queue;
         // Mark thread T as ready to run;
